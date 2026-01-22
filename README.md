@@ -45,5 +45,22 @@ make dev-dashboard
 ```
 Visit `http://localhost:3001` (or the port Next.js assigned).
 
+## Development
+
+### Building the CLI
+```bash
+make build
+```
+The binary will be available at `./bin/crok`.
+
+### Releases
+Releases are handled automatically via GoReleaser and GitHub Actions when a new tag is pushed.
+Supported platforms: Linux, Windows, macOS, and Android (arm/arm64).
+
+```bash
+git tag -a v0.1.0 -m "First release"
+git push origin v0.1.0
+```
+
 ## License
 MIT
