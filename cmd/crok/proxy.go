@@ -234,10 +234,11 @@ func (p *ProxyServer) handleHTTPS(w http.ResponseWriter, r *http.Request) {
 	// Simple CONNECT tunneling
 	fmt.Printf("[JAW] Tunneling HTTPS to %s\n", r.Host)
 	
-	destConn, err := url.Parse("https://" + r.Host)
+	_, err := url.Parse("https://" + r.Host)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
 	}
 
 	// In a real robust implementation, we would hijack the connection here
