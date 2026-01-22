@@ -22,17 +22,17 @@ export default function StatsCards({ transactions }: StatsCardsProps) {
     { 
       label: 'Total Settled', 
       value: `$${totalSettled.toFixed(2)}`, 
-      icon: <TransactionIcon color="primary" /> 
+      icon: <TransactionIcon sx={{ color: '#00ffff' }} /> 
     },
     { 
       label: 'USDC Balance', 
       value: '2,450.00', 
-      icon: <WalletIcon color="secondary" /> 
+      icon: <WalletIcon sx={{ color: '#00ffff' }} /> 
     },
     { 
       label: 'Active Policies', 
       value: '1', 
-      icon: <PolicyIcon color="info" /> 
+      icon: <PolicyIcon sx={{ color: '#00ffff' }} /> 
     },
   ];
 
@@ -40,14 +40,14 @@ export default function StatsCards({ transactions }: StatsCardsProps) {
     <>
       {stats.map((stat) => (
         <Grid size={{ xs: 12, md: 4 }} key={stat.label}>
-          <Card variant="outlined">
+          <Card variant="outlined" sx={{ bgcolor: '#050505', border: '1px solid rgba(0, 255, 255, 0.2)' }}>
             <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box sx={{ mr: 2, p: 1, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}>
+              <Box sx={{ mr: 2, p: 1, border: '1px solid rgba(0, 255, 255, 0.2)', bgcolor: 'rgba(0, 255, 255, 0.05)' }}>
                 {stat.icon}
               </Box>
               <Box>
-                <Typography color="text.secondary" variant="body2">{stat.label}</Typography>
-                <Typography variant="h5" fontWeight="bold">{stat.value}</Typography>
+                <Typography color="#b0b0b0" variant="caption" sx={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stat.label}</Typography>
+                <Typography variant="h5" fontWeight="bold" sx={{ color: '#00ffff', textShadow: '0 0 5px rgba(0, 255, 255, 0.3)' }}>{stat.value}</Typography>
               </Box>
             </CardContent>
           </Card>
