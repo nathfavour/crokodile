@@ -12,6 +12,9 @@ dev-merchant:
 dev-dashboard:
 	cd dashboard && npm run dev
 
+build-dashboard:
+	cd dashboard && npm run build
+
 proxy:
 	go run ./cmd/crok
 
