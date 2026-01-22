@@ -10,7 +10,6 @@ import {
   AppBar, 
   Toolbar, 
   IconButton, 
-  Badge,
   Card,
   CardContent,
   Divider,
@@ -22,7 +21,6 @@ import {
   CircularProgress
 } from '@mui/material';
 import { 
-  Notifications as NotificationsIcon, 
   AccountBalanceWallet as WalletIcon,
   Security as PolicyIcon,
   Receipt as TransactionIcon,
@@ -45,26 +43,26 @@ export default function Dashboard() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = React.useCallback(async () => {
     try {
       const response = await fetch('http://localhost:3000/transactions');
       if (!response.ok) throw new Error('Failed to fetch transactions');
       const data = await response.json();
       setTransactions(data);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching transactions:', err);
       setError('Connection to engine lost');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   React.useEffect(() => {
     fetchTransactions();
     const interval = setInterval(fetchTransactions, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchTransactions]);
 
   const stats = [
     { label: 'Total Settled', value: `$${(transactions.filter(t => t.status === 'success').length * 0.01).toFixed(2)}`, icon: <TransactionIcon color="primary" /> },
@@ -95,7 +93,7 @@ export default function Dashboard() {
         <Grid container spacing={3}>
           {/* Stats Cards */}
           {stats.map((stat) => (
-            <Grid item xs={12} md={4} key={stat.label}>
+            <Grid size={{ xs: 12, md: 4 }} key={stat.label}>
               <Card variant="outlined">
                 <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
                   <Box sx={{ mr: 2, p: 1, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}>
@@ -111,7 +109,7 @@ export default function Dashboard() {
           ))}
 
           {/* Main Feed */}
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Paper variant="outlined" sx={{ p: 0, overflow: 'hidden', minHeight: 400 }}>
               <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" fontWeight="bold">Live activity feed</Typography>
@@ -125,7 +123,7 @@ export default function Dashboard() {
               ) : transactions.length === 0 ? (
                 <Box sx={{ p: 4, textAlign: 'center' }}>
                   <Typography color="text.secondary">No transactions intercepted yet.</Typography>
-                  <Typography variant="caption" color="text.secondary">Run `make run CMD="..."` to see activity.</Typography>
+                  <Typography variant="caption" color="text.secondary">Run `make run CMD=&quot;...&quot;` to see activity.</Typography>
                 </Box>
               ) : (
                 <List sx={{ p: 0 }}>
@@ -160,7 +158,7 @@ export default function Dashboard() {
           </Grid>
 
           {/* Side Panel */}
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Typography variant="h6" fontWeight="bold" gutterBottom>Local Policy</Typography>
               <Box sx={{ mt: 2 }}>
