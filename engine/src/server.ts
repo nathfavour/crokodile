@@ -1,0 +1,40 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { processPayment } from './main';
+
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.send('🐊 Crokodile Engine Local Server');
+});
+
+app.post('/pay', async (req, res) => {
+  console.log('📬 Received payment request:', req.body);
+  
+  const config = {
+    endpoint: process.env.APPWRITE_ENDPOINT,
+    projectId: process.env.APPWRITE_PROJECT_ID,
+    apiKey: process.env.APPWRITE_API_KEY,
+    databaseId: process.env.APPWRITE_DATABASE_ID
+  };
+
+  try {
+    const result = await processPayment(req.body, config);
+    console.log('✅ Payment processed successfully');
+    res.json(result);
+  } catch (err: any) {
+    console.error('❌ Payment failed:', err.message);
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`🚀 Crokodile Brain (Engine) listening at http://localhost:${port}`);
+});
