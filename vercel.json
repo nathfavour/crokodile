@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "public": true,
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/install.sh", "destination": "/dashboard/install.sh" },
-    { "source": "/(.*)", "destination": "/dashboard/$1" }
-  ]
-}
