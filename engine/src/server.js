@@ -1,7 +1,7 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { processPayment } from './main';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const { processPayment } = require('./main');
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // In-memory store for local development
-const transactions: any[] = [];
+const transactions = [];
 
 app.get('/', (req, res) => {
   res.send('🐊 Crokodile Engine Local Server');
@@ -46,7 +46,7 @@ app.post('/pay', async (req, res) => {
 
     console.log('✅ Payment processed successfully');
     res.json(result);
-  } catch (err: any) {
+  } catch (err) {
     console.error('❌ Payment failed:', err.message);
     
     transactions.unshift({

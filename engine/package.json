@@ -1,24 +1,16 @@
 {
   "name": "engine",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Crokodile Engine - Appwrite Functions and Local Dev Server",
+  "main": "src/main.js",
   "scripts": {
-    "dev:brain": "ts-node src/server.ts",
-    "dev:merchant": "ts-node src/mock-merchant.ts",
+    "dev:brain": "node src/server.js",
+    "dev:merchant": "node src/mock-merchant.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.0.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  },
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
