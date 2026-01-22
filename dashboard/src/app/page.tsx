@@ -27,8 +27,8 @@ export default function Dashboard() {
       const data = await response.json();
       setTransactions(data);
       setError(null);
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
         console.warn('Fetch aborted due to timeout');
       } else {
         console.error('Error fetching transactions:', err);
