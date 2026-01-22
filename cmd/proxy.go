@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -36,84 +37,189 @@ func (p *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *ProxyServer) handleHTTP(w http.ResponseWriter, r *http.Request) {
+
 	log.Printf("[JAW] Intercepted: %s %s from %s", r.Method, r.URL.String(), r.RemoteAddr)
 
-	// Perform the original request
-	resp, err := p.performRequest(r, "")
-	if err != nil {
-		log.Printf("[JAW] Error performing request: %v", err)
-		http.Error(w, err.Error(), http.StatusBadGateway)
-		return
-	}
-	defer resp.Body.Close()
 
-	// If 402, negotiate payment
-	if resp.StatusCode == http.StatusPaymentRequired {
-		log.Printf("[JAW] ⚠️ 402 Detected from %s. Negotiating payment...", r.URL.Host)
-		
-		// Simulate reasoning (in Phase 4 this comes from agent logs/context)
-		reasoning := fmt.Sprintf("Automated payment for service at %s via Crokodile", r.URL.Host)
-		
-		payResp, err := p.Engine.RequestPayment(PaymentPayload{
-			AgentID:   "local-agent-001",
-			Amount:    0.01, // Mock amount, should be extracted from 402 headers
-			Merchant:  r.URL.Host,
-			Currency:  "USDC",
-			Reasoning: reasoning,
-		})
+
+	// Buffer the body so we can read it multiple times (initial request + retry)
+
+	var bodyBytes []byte
+
+	if r.Body != nil {
+
+		var err error
+
+		bodyBytes, err = io.ReadAll(r.Body)
 
 		if err != nil {
-			log.Printf("[JAW] ❌ Payment negotiation failed: %v", err)
-			p.copyResponse(w, resp)
+
+			log.Printf("[JAW] Error reading body: %v", err)
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+
 			return
+
 		}
+
+		r.Body.Close()
+
+	}
+
+
+
+	// Perform the original request
+
+	resp, err := p.performRequest(r, bodyBytes, "")
+
+	if err != nil {
+
+		log.Printf("[JAW] Error performing request: %v", err)
+
+		http.Error(w, err.Error(), http.StatusBadGateway)
+
+		return
+
+	}
+
+	defer resp.Body.Close()
+
+
+
+	// If 402, negotiate payment
+
+	if resp.StatusCode == http.StatusPaymentRequired {
+
+		log.Printf("[JAW] ⚠️ 402 Detected from %s. Negotiating payment...", r.URL.Host)
+
+		
+
+		// In a real scenario, we would parse response headers for exact amounts
+
+		// and the AI agent's internal state for "reasoning".
+
+		reasoning := fmt.Sprintf("Automated payment for service at %s via Crokodile", r.URL.Host)
+
+		
+
+		payResp, err := p.Engine.RequestPayment(PaymentPayload{
+
+			AgentID:   "local-agent-001",
+
+			Amount:    0.01, 
+
+			Merchant:  r.URL.Host,
+
+			Currency:  "USDC",
+
+			Reasoning: reasoning,
+
+		})
+
+
+
+		if err != nil {
+
+			log.Printf("[JAW] ❌ Payment negotiation failed: %v", err)
+
+			p.copyResponse(w, resp)
+
+			return
+
+		}
+
+
 
 		log.Printf("[JAW] ✅ Payment settled (TX: %s). Retrying request...", payResp.TxHash)
 
+
+
 		// Retry with proof
-		retryResp, err := p.performRequest(r, payResp.PaymentProof)
+
+		retryResp, err := p.performRequest(r, bodyBytes, payResp.PaymentProof)
+
 		if err != nil {
+
 			log.Printf("[JAW] Error retrying request: %v", err)
+
 			http.Error(w, err.Error(), http.StatusBadGateway)
+
 			return
+
 		}
+
 		defer retryResp.Body.Close()
+
 		
+
 		p.copyResponse(w, retryResp)
+
 		return
+
 	}
+
+
 
 	p.copyResponse(w, resp)
+
 }
-func (p *ProxyServer) performRequest(r *http.Request, proof string) (*http.Response, error) {
-	// Create a new request to the target
-	// We need to handle relative vs absolute URLs in proxy mode
+
+
+
+func (p *ProxyServer) performRequest(r *http.Request, body []byte, proof string) (*http.Response, error) {
+
 	targetURL := r.URL.String()
+
 	if !strings.HasPrefix(targetURL, "http") {
+
 		targetURL = "http://" + r.Host + r.URL.Path
+
 		if r.URL.RawQuery != "" {
+
 			targetURL += "?" + r.URL.RawQuery
+
 		}
+
 	}
 
-	outReq, err := http.NewRequest(r.Method, targetURL, r.Body)
+
+
+	outReq, err := http.NewRequest(r.Method, targetURL, io.NopCloser(bytes.NewReader(body)))
+
 	if err != nil {
+
 		return nil, err
+
 	}
+
+
 
 	// Copy original headers
+
 	for k, v := range r.Header {
+
 		outReq.Header[k] = v
+
 	}
+
+
 
 	// Inject payment proof if available
+
 	if proof != "" {
+
 		outReq.Header.Set("X-402-Payment-Proof", proof)
+
 		outReq.Header.Set("Authorization", "Bearer "+proof)
+
 	}
 
+
+
 	client := &http.Client{}
+
 	return client.Do(outReq)
+
 }
 
 func (p *ProxyServer) copyResponse(w http.ResponseWriter, resp *http.Response) {
