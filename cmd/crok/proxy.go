@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -86,35 +87,267 @@ func (p *ProxyServer) handleHTTP(w http.ResponseWriter, r *http.Request) {
 
 
 
-	// If 402, negotiate payment
+		// If 402, negotiate payment
 
-	if resp.StatusCode == http.StatusPaymentRequired {
 
-		log.Printf("[JAW] ⚠️ 402 Detected from %s. Negotiating payment...", r.URL.Host)
 
-		
+		if resp.StatusCode == http.StatusPaymentRequired {
 
-		// In a real scenario, we would parse response headers for exact amounts
 
-		// and the AI agent's internal state for "reasoning".
 
-		reasoning := fmt.Sprintf("Automated payment for service at %s via Crokodile", r.URL.Host)
+			log.Printf("[JAW] ⚠️ 402 Detected from %s. Negotiating payment...", r.URL.Host)
 
-		
 
-		payResp, err := p.Engine.RequestPayment(PaymentPayload{
 
-			AgentID:   "local-agent-001",
+	
 
-			Amount:    0.01, 
 
-			Merchant:  r.URL.Host,
 
-			Currency:  "USDC",
+					// Extract payment details from header if present
 
-			Reasoning: reasoning,
 
-		})
+
+	
+
+
+
+					// Spec v1.0: X-402-Payment-Request: amount=0.01, currency=USDC, merchant=domain.com
+
+
+
+	
+
+
+
+					amount := 0.01
+
+
+
+	
+
+
+
+					currency := "USDC"
+
+
+
+	
+
+
+
+					merchant := r.URL.Host
+
+
+
+	
+
+
+
+					agentID := "local-agent-001"
+
+
+
+	
+
+
+
+					reasoning := fmt.Sprintf("Automated payment for service at %s via Crokodile", r.URL.Host)
+
+
+
+	
+
+
+
+			
+
+
+
+	
+
+
+
+					if aID := r.Header.Get("X-Agent-ID"); aID != "" {
+
+
+
+	
+
+
+
+						agentID = aID
+
+
+
+	
+
+
+
+					}
+
+
+
+	
+
+
+
+					if intent := r.Header.Get("X-402-Intent"); intent != "" {
+
+
+
+	
+
+
+
+						reasoning = intent
+
+
+
+	
+
+
+
+					}
+
+
+
+	
+
+
+
+			
+
+
+
+	
+
+
+
+					if header := resp.Header.Get("X-402-Payment-Request"); header != "" {
+
+
+
+				parts := strings.Split(header, ",")
+
+
+
+				for _, part := range parts {
+
+
+
+					kv := strings.Split(strings.TrimSpace(part), "=")
+
+
+
+					if len(kv) == 2 {
+
+
+
+						switch kv[0] {
+
+
+
+											case "amount":
+
+
+
+												if val, err := strconv.ParseFloat(kv[1], 64); err == nil {
+
+
+
+													amount = val
+
+
+
+												}
+
+
+
+											case "currency":
+
+
+
+							currency = kv[1]
+
+
+
+						case "merchant":
+
+
+
+							merchant = kv[1]
+
+
+
+						}
+
+
+
+					}
+
+
+
+				}
+
+
+
+			}
+
+
+
+	
+
+
+
+					payResp, err := p.Engine.RequestPayment(PaymentPayload{
+
+
+
+	
+
+
+
+						AgentID:   agentID,
+
+
+
+	
+
+
+
+						Amount:    amount,
+
+
+
+	
+
+
+
+						Merchant:  merchant,
+
+
+
+	
+
+
+
+						Currency:  currency,
+
+
+
+	
+
+
+
+						Reasoning: reasoning,
+
+
+
+	
+
+
+
+					})
 
 
 
