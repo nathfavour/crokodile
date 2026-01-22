@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 🐊 CROKODILE Universal Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/nathfavour/crokodile/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/nathfavour/crokodile/master/install.sh | bash
 
 set -e
 

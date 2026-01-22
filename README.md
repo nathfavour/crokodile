@@ -18,7 +18,7 @@
 
 #### 🐧 Linux / 🍎 macOS / 🤖 Android
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nathfavour/crokodile/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nathfavour/crokodile/master/install.sh | bash
 ```
 
 #### 🏗️ From Source

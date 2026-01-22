@@ -3,9 +3,13 @@ name: release
 on:
   push:
     branches:
-      - main
+      - master
     tags:
       - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -23,10 +27,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.25'
+          cache: true
 
       - name: Build Binaries
         run: |
           mkdir -p dist
+          
+          # Prefetch dependencies to cache them properly before parallel builds
+          go mod download
           
           # Determine version
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
@@ -38,40 +46,36 @@ jobs:
           COMMIT=${{ github.sha }}
           DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           
-          # Define platforms (matching GoReleaser list for consistency)
+          # Define platforms
           platforms=(
-            "linux/amd64"
-            "linux/arm64"
-            "linux/arm"
-            "linux/386"
-            "darwin/amd64"
-            "darwin/arm64"
-            "windows/amd64"
-            "windows/386"
-            "android/arm64"
-            "android/arm"
-            "android/amd64"
+            "linux/amd64" "linux/arm64" "linux/arm" "linux/386"
+            "darwin/amd64" "darwin/arm64"
+            "windows/amd64" "windows/386"
+            "android/arm64" "android/arm" "android/amd64"
           )
           
           for platform in "${platforms[@]}"; do
-            GOOS=${platform%/*}
-            GOARCH=${platform#*/}
-            
-            # Binary name template: crok_linux_amd64
-            # We will use this simple naming for the direct releases
-            BINARY_NAME="crok_${GOOS}_${GOARCH}"
-            if [ "$GOOS" == "windows" ]; then
-              BINARY_NAME+=".exe"
-            fi
-            
-            echo "Building for $GOOS/$GOARCH..."
-            CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build \
-              -ldflags="-s -w -X main.version=$VERSION -X main.commit=$COMMIT -X main.date=$DATE" \
-              -o "dist/$BINARY_NAME" ./cmd/crok
+            (
+              GOOS=${platform%/*}
+              GOARCH=${platform#*/}
+              
+              BINARY_NAME="crok_${GOOS}_${GOARCH}"
+              [ "$GOOS" == "windows" ] && BINARY_NAME+=".exe"
+              
+              echo "🔨 Building $GOOS/$GOARCH..."
+              CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build \
+                -trimpath \
+                -ldflags="-s -w -X main.version=$VERSION -X main.commit=$COMMIT -X main.date=$DATE" \
+                -o "dist/$BINARY_NAME" ./cmd/crok
+            ) &
           done
+          
+          # Wait for all background builds to finish
+          wait
+          echo "✅ All builds completed."
 
       - name: Update Rolling Tag
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
