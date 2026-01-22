@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Container, Grid2 as Grid, Box } from '@mui/material';
+import { Container, Grid, Box } from '@mui/material';
 import DashboardHeader from '@/components/DashboardHeader';
 import StatsCards from '@/components/StatsCards';
 import ActivityFeed from '@/components/ActivityFeed';

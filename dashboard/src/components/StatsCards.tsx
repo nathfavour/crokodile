@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Grid2 as Grid, Card, CardContent, Box, Typography } from '@mui/material';
+import { Grid, Card, CardContent, Box, Typography } from '@mui/material';
 import { 
   AccountBalanceWallet as WalletIcon,
   Security as PolicyIcon,
