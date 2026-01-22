@@ -1,0 +1,6 @@
+CROKODILE.md
+node_modules
+.env
+bin
+dist
+*.log
