@@ -24,18 +24,42 @@ const processPayment = async (payload, config) => {
 
         if (policies.total > 0) {
           const policy = policies.documents[0];
+          
+          // Max Per Request Check
           if (amount > policy.maxPerRequest) {
-            throw new Error(`Transaction exceeds max limit per request ($${policy.maxPerRequest})`);
+            throw new Error(`TRANSACTION_REJECTED: Amount ${amount} exceeds max per-request limit of ${policy.maxPerRequest}`);
+          }
+
+          // Daily Budget Check
+          const now = new Date();
+          const startOfDay = new Date(now.setHours(0,0,0,0)).getTime();
+          
+          const todayTx = await databases.listDocuments(
+            databaseId,
+            'transactions',
+            [
+              Query.equal('agentId', agentId),
+              Query.greaterThanEqual('timestamp', startOfDay),
+              Query.equal('status', 'settled')
+            ]
+          );
+
+          const spentToday = todayTx.documents.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+          if (spentToday + parseFloat(amount) > policy.dailyLimit) {
+            throw new Error(`BUDGET_EXCEEDED: Daily limit of ${policy.dailyLimit} reached. Total spent: ${spentToday}`);
           }
         }
       } catch (e) {
+        if (e.message.includes('REJECTED') || e.message.includes('EXCEEDED')) throw e;
         console.warn('Policy check skipped or failed:', e.message);
       }
     }
 
-    // 2. Reasoning Audit
-    if (!reasoning || reasoning.length < 5) {
-      throw new Error('Insufficient reasoning for payment. AI Agents must provide justification.');
+    // 2. Reasoning Audit (Advanced)
+    const sensitiveKeywords = ['gambling', 'personal', 'private'];
+    const lowerReasoning = reasoning.toLowerCase();
+    if (sensitiveKeywords.some(word => lowerReasoning.includes(word))) {
+      throw new Error('POLICY_VIOLATION: Reasoning contains restricted categories.');
     }
 
     // 3. Transaction Signing (Simulation)
@@ -52,10 +76,12 @@ const processPayment = async (payload, config) => {
           {
             merchant,
             amount: parseFloat(amount),
+            currency: currency || 'USDC',
             txHash,
             status: 'settled',
             reasoningTrace: reasoning,
-            agentId
+            agentId,
+            timestamp: Date.now()
           }
         );
       } catch (e) {
