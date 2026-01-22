@@ -239,7 +239,6 @@ func (p *ProxyServer) handleHTTPS(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	}
 
 	// In a real robust implementation, we would hijack the connection here
 	// and perform MITM with a trusted CA. For now, we just inform the user.
