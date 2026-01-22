@@ -15,10 +15,18 @@
 ## 🚀 Quick Start
 
 ### 1. Installation
+
+#### 🐧 Linux / 🍎 macOS / 🤖 Android
+```bash
+curl -fsSL https://raw.githubusercontent.com/nathfavour/crokodile/main/install.sh | bash
+```
+
+#### 🏗️ From Source
 ```bash
 git clone https://github.com/nathfavour/crokodile.git
 cd crokodile
 make install
+make build
 ```
 
 ### 2. Launch Services
