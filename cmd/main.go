@@ -2,32 +2,74 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
+	"strings"
 )
 
 func main() {
 	proxyPort := ":8080"
-	fmt.Printf("🐊 CROKODILE Jaw (Go CLI) starting on %s...\n", proxyPort)
+	fmt.Printf("🐊 CROKODILE Cmd (Go CLI) starting on %s...\n", proxyPort)
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Log the intercepted request
-		fmt.Printf("[JAW] Intercepted: %s %s\n", r.Method, r.URL.String())
-
-		// In a real implementation, we would forward the request
-		// and check for 402 Payment Required.
-		
-		// For now, this is a placeholder for the transparent proxy logic.
-		w.Header().Set("X-Crokodile-Status", "Intercepted")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Crokodile Jaw is snapping up requests!"))
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodConnect {
+			handleHTTPS(w, r)
+			return
+		}
+		handleHTTP(w, r)
 	})
 
-	log.Fatal(http.ListenAndServe(proxyPort, nil))
+	log.Fatal(http.ListenAndServe(proxyPort, handler))
 }
 
-func handle402(target *url.URL) *httputil.ReverseProxy {
-	return httputil.NewSingleHostReverseProxy(target)
+func handleHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("[CMD] Intercepted: %s %s\n", r.Method, r.URL.String())
+
+	// Create a new request to the target
+	outReq, err := http.NewRequest(r.Method, r.URL.String(), r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Copy headers
+	for k, v := range r.Header {
+		outReq.Header[k] = v
+	}
+
+	// Execute the request
+	client := &http.Client{}
+	resp, err := client.Do(outReq)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Check for 402 Payment Required
+	if resp.StatusCode == 402 {
+		fmt.Printf("[CMD] ⚠️ 402 Payment Required detected from %s\n", r.URL.Host)
+		paymentRequest := resp.Header.Get("X-402-Payment-Request")
+		fmt.Printf("[CMD] Payment Request: %s\n", paymentRequest)
+		
+		// TODO: Call the Engine (Brain) to negotiate payment
+		// For now, we just pass the 402 back
+	}
+
+	// Copy response headers and body back to original requester
+	for k, v := range resp.Header {
+		w.Header()[k] = v
+	}
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+}
+
+func handleHTTPS(w http.ResponseWriter, r *http.Request) {
+	// Simple HTTPS tunneling (CONNECT method)
+	// Note: This won't allow inspecting traffic without MITM setup
+	fmt.Printf("[CMD] Tunneling HTTPS: %s\n", r.Host)
+	
+	// This is a placeholder for actual MITM or simple tunneling
+	http.Error(w, "HTTPS Interception requires MITM setup (CA certs)", http.StatusNotImplemented)
 }

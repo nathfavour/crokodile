@@ -4,7 +4,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-black text-green-500 font-mono p-8">
       <header className="border-b border-green-900 pb-4 mb-8">
-        <h1 className="text-3xl font-bold">🐊 CROKODILE EYE</h1>
+        <h1 className="text-3xl font-bold">🐊 CROKODILE DASHBOARD</h1>
         <p className="text-sm opacity-70">M2M Economy Real-time Monitoring</p>
       </header>
       

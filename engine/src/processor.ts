@@ -1,5 +1,5 @@
 /**
- * 🐊 CROKODILE Brain (TS Processor)
+ * 🐊 CROKODILE Engine (TS Processor)
  * Handles EIP-3009 transaction signing and policy enforcement.
  */
 
@@ -11,7 +11,7 @@ interface PaymentRequest {
 }
 
 export async function processPayment(request: PaymentRequest) {
-  console.log(`[BRAIN] Processing payment for ${request.agentId}...`);
+  console.log(`[ENGINE] Processing payment for ${request.agentId}...`);
   
   // 1. Identity Verification
   // 2. Policy Enforcement (DB check)
