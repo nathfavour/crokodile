@@ -1,6 +1,6 @@
 'use client';
 
-import { createTheme } from '@mui/material/styles';
+import { createTheme, alpha } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
@@ -14,36 +14,51 @@ const theme = createTheme({
       main: '#00ffff',
     },
     background: {
-      default: '#000000', // Pitch Black
-      paper: '#050505',   // Slightly off-black for depth
+      default: '#0a0a0a', // Deep charcoal-black
+      paper: '#121212',   // Slightly lighter for layers
     },
     text: {
       primary: '#ffffff',
-      secondary: '#b0b0b0',
+      secondary: 'rgba(255, 255, 255, 0.7)',
     },
-    divider: 'rgba(0, 255, 255, 0.1)',
+    divider: 'rgba(0, 255, 255, 0.08)',
   },
   typography: {
-    fontFamily: 'var(--font-geist-mono), monospace', // Use mono for the "hacker" vibe
+    fontFamily: 'var(--font-geist-sans), Inter, sans-serif',
+    h1: { fontWeight: 800, letterSpacing: '-0.02em' },
+    h2: { fontWeight: 800, letterSpacing: '-0.02em' },
+    h3: { fontWeight: 700, letterSpacing: '-0.01em' },
+    h4: { fontWeight: 700, letterSpacing: '-0.01em' },
+    h5: { fontWeight: 600 },
+    h6: { fontWeight: 600 },
+    button: {
+      textTransform: 'none',
+      fontWeight: 600,
+      letterSpacing: '0.02em',
+    },
   },
   shape: {
-    borderRadius: 0, // Sharp edges for a more technical look
+    borderRadius: 12,
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#000000',
-          scrollbarColor: '#00ffff #000000',
+          backgroundColor: '#0a0a0a',
+          color: '#ffffff',
+          scrollbarColor: 'rgba(0, 255, 255, 0.3) transparent',
           '&::-webkit-scrollbar': {
-            width: '8px',
+            width: '6px',
           },
           '&::-webkit-scrollbar-track': {
-            backgroundColor: '#000000',
+            backgroundColor: 'transparent',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#00ffff',
-            borderRadius: '0px',
+            backgroundColor: 'rgba(0, 255, 255, 0.2)',
+            borderRadius: '10px',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 255, 255, 0.4)',
+            },
           },
         },
       },
@@ -51,9 +66,10 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#000000',
-          borderBottom: '1px solid #00ffff',
-          boxShadow: '0 0 10px rgba(0, 255, 255, 0.2)',
+          backgroundColor: alpha('#0a0a0a', 0.8),
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(0, 255, 255, 0.1)',
+          boxShadow: 'none',
         },
       },
     },
@@ -61,10 +77,15 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          border: '1px solid rgba(0, 255, 255, 0.1)',
+          backgroundColor: '#121212',
+          border: '1px solid rgba(0, 255, 255, 0.05)',
+          transition: 'all 0.2s ease-in-out',
+        },
+        outlined: {
+          borderColor: 'rgba(0, 255, 255, 0.1)',
           '&:hover': {
-            borderColor: 'rgba(0, 255, 255, 0.4)',
-            boxShadow: '0 0 15px rgba(0, 255, 255, 0.1)',
+            borderColor: 'rgba(0, 255, 255, 0.2)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 8px rgba(0, 255, 255, 0.05)',
           },
         },
       },
@@ -72,15 +93,22 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          fontWeight: 700,
-          border: '1px solid #00ffff',
-          color: '#00ffff',
+          borderRadius: 8,
+          padding: '8px 20px',
+          transition: 'all 0.2s ease-in-out',
+        },
+        containedPrimary: {
+          boxShadow: '0 4px 14px rgba(0, 255, 255, 0.3)',
           '&:hover': {
-            backgroundColor: '#00ffff',
-            color: '#000000',
-            boxShadow: '0 0 20px #00ffff',
+            boxShadow: '0 6px 20px rgba(0, 255, 255, 0.4)',
+            backgroundColor: '#33ffff',
+          },
+        },
+        outlinedPrimary: {
+          borderWidth: '1.5px',
+          '&:hover': {
+            borderWidth: '1.5px',
+            backgroundColor: alpha('#00ffff', 0.05),
           },
         },
       },
@@ -88,17 +116,20 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: '#050505',
-          border: '1px solid rgba(0, 255, 255, 0.2)',
+          backgroundColor: '#121212',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          borderRadius: 16,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
-          borderColor: '#00ffff',
-          color: '#00ffff',
+          fontWeight: 600,
+          borderRadius: 6,
+        },
+        outlined: {
+          borderColor: 'rgba(0, 255, 255, 0.3)',
         },
       },
     },
