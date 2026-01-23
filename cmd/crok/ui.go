@@ -52,21 +52,6 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 		table.WithHeight(10),
 	)
 
-	// The following lines were removed as they were not present in the original code and caused a syntax error.
-	// s := table.DefaultStyles()
-	// // Using correct style assignment
-	// s.Header = s.Header.
-	// 		BorderStyle(lipgloss.NormalBorder()).
-	// 		BorderForeground(lipgloss.Color("240")),
-	// 		Bold(false)
-	// 
-s.Selected = s.Selected.
-	// 		Foreground(lipgloss.Color("229")),
-	// 		Background(accentColor).
-	// 		Bold(false)
-	// 
-t.SetStyles(s)
-
 	return model{
 		table:   t,
 		proxy:   p,
@@ -178,8 +163,9 @@ func (m model) View() string {
 		Render(sidebarContent)
 
 	// Main Content
+	tableHeader := headerStyle.Render("LIVE INTERCEPTION TRAFFIC")
 	logContent := lipgloss.JoinVertical(lipgloss.Left,
-		headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
+		tableHeader,
 		"\n",
 		m.table.View(),
 	)
@@ -194,7 +180,7 @@ func (m model) View() string {
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
 		Align(lipgloss.Center).
-		Foreground(lipgloss.Color("#475569")).
+		Foreground(lipgloss.Color("#475569")),
 		Render("© 2026 CROKODILE SECURE PROTOCOL • v2.0.4-pro")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
