@@ -110,7 +110,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				paid = "0.01 USDC"
 			}
 		
-			rows = append(rows, table.Row{
+		ows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
 				l.Method,
 				l.URL,
@@ -180,11 +180,12 @@ func (m model) View() string {
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
 		Align(lipgloss.Center).
-		Foreground(lipgloss.Color("#475569")),
+		Foreground(lipgloss.Color("#475569")).
 		Render("© 2026 CROKODILE SECURE PROTOCOL • v2.0.4-pro")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.JoinHorizontal(lipgloss.Top, sidebar, logTable),
+		"\n",
 		footer,
 	)
 }
