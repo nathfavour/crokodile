@@ -55,11 +55,13 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")),
+		BorderForeground(lipgloss.Color("240")).
 		Bold(false)
-	
-	// Fix: Apply styles via table.WithStyles or set individual style fields correctly
-	t.SetStyles(s)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")),
+		Background(accentColor).
+		Bold(false)
+t.SetStyles(s)
 
 	return model{
 		table:   t,
@@ -118,7 +120,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if l.Paid {
 				paid = "0.01 USDC"
 			}
-		ows = append(rows, table.Row{
+		
+rows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
 				l.Method,
 				l.URL,
@@ -140,50 +143,49 @@ func (m model) View() string {
 	}
 
 	sidebarWidth := 30
-	mainWidth := m.width - sidebarWidth - 6
+	mainWidth := m.width - sidebarWidth - 10
 
-	// Sidebar
+	// Sidebar components
+	sidebarContent := lipgloss.JoinVertical(lipgloss.Left,
+		headerStyle.Render("🐊 CROKODILE CLI"),
+		"\n",
+		lipgloss.NewStyle().Foreground(grayColor).Render("NODE_STATUS:"),
+		statusStyle.Render(m.status),
+		"\n",
+		lipgloss.NewStyle().Foreground(grayColor).Render("AGENT_ID:"),
+		lipgloss.NewStyle().Bold(true).Render(m.agentID),
+		"\n",
+		lipgloss.NewStyle().Foreground(grayColor).Render("UPSTREAM:"),
+		lipgloss.NewStyle().Render(m.engine.Endpoint),
+		"\n",
+		lipgloss.NewStyle().Foreground(grayColor).Render("PROXY_PORT:"),
+		lipgloss.NewStyle().Render(m.proxy.Port),
+		"\n\n",
+		lipgloss.NewStyle().Foreground(grayColor).Render("CONTROLS:"),
+		lipgloss.NewStyle().Faint(true).Render("q: Quit\n↑/↓: Scroll Logs"),
+	)
+
 	sidebar := lipgloss.NewStyle().
 		Width(sidebarWidth).
 		Height(m.height - 4).
 		Padding(1).
 		BorderStyle(lipgloss.RoundedBorder()).
 		BorderForeground(accentColor).
-		Render(
-			lipgloss.JoinVertical(lipgloss.Left,
-				headerStyle.Render("🐊 CROKODILE CLI"),
-				"\n",
-				lipgloss.NewStyle().Foreground(grayColor).Render("NODE_STATUS:"),
-				statusStyle.Render(m.status),
-				"\n",
-				lipgloss.NewStyle().Foreground(grayColor).Render("AGENT_ID:"),
-				lipgloss.NewStyle().Bold(true).Render(m.agentID),
-				"\n",
-				lipgloss.NewStyle().Foreground(grayColor).Render("ENGINE_UPSTREAM:"),
-				lipgloss.NewStyle().Render(m.engine.Endpoint),
-				"\n",
-				lipgloss.NewStyle().Foreground(grayColor).Render("PROXY_PORT:"),
-				lipgloss.NewStyle().Render(m.proxy.Port),
-				"\n\n",
-				lipgloss.NewStyle().Foreground(grayColor).Render("LAST_INTERCEPT:"),
-				lipgloss.NewStyle().Faint(true).Render(m.lastLog.URL),
-				"\n\n",
-				lipgloss.NewStyle().Foreground(grayColor).Render("CONTROLS:"),
-				lipgloss.NewStyle().Faint(true).Render("q: Quit\n↑/↓: Scroll Logs"),
-			),
-		)
+		Render(sidebarContent)
 
 	// Main Content
+	tableHeader := headerStyle.Render("LIVE INTERCEPTION TRAFFIC")
+	logContent := lipgloss.JoinVertical(lipgloss.Left,
+		tableHeader,
+		m.table.View(),
+	)
+
 	logTable := lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder()).
 		BorderForeground(accentColor).
 		Width(mainWidth).
-		Render(
-			lipgloss.JoinVertical(lipgloss.Left,
-				headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
-				m.table.View(),
-			),
-		)
+		Padding(1).
+		Render(logContent)
 
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
