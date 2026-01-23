@@ -111,10 +111,10 @@ export default function DashboardView() {
     return () => clearInterval(interval);
   }, [fetchTransactions]);
 
-  const displayTransactions = transactions.length > 0 ? transactions.slice(0, 5) : [
-    { id: 'mock-1', merchant: 'CloudCompute-ZK', hash: '0x821...F18', amount: '42.50', agentId: 'Agent_018', time: '12:44:02.12', status: 'SETTLED' },
-    { id: 'mock-2', merchant: 'Node-Charging-88', hash: '0x321...E29', amount: '112.00', agentId: 'Agent_012', time: '12:42:10.05', status: 'SETTLED' },
-    { id: 'mock-3', merchant: 'DataLake-S3', hash: '0x992...B04', amount: '8.12', agentId: 'Agent_099', time: '12:41:55.30', status: 'SETTLED' },
+  const displayTransactions: Transaction[] = transactions.length > 0 ? transactions.slice(0, 5) : [
+    { id: 'mock-1', merchant: 'CloudCompute-ZK', hash: '0x821...F18', amount: '42.50', agentId: 'Agent_018', time: '12:44:02.12', status: 'SETTLED', timestamp: '', merchantDomain: '' , currency: 'USDC' },
+    { id: 'mock-2', merchant: 'Node-Charging-88', hash: '0x321...E29', amount: '112.00', agentId: 'Agent_012', time: '12:42:10.05', status: 'SETTLED', timestamp: '', merchantDomain: '' , currency: 'USDC' },
+    { id: 'mock-3', merchant: 'DataLake-S3', hash: '0x992...B04', amount: '8.12', agentId: 'Agent_099', time: '12:41:55.30', status: 'SETTLED', timestamp: '', merchantDomain: '' , currency: 'USDC' },
   ];
 
   return (

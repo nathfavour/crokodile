@@ -37,7 +37,7 @@ export default function FleetStatusView() {
 
       <Grid container spacing={3}>
         {agents.map((agent) => (
-          <Grid item xs={12} md={6} lg={3} key={agent.id}>
+          <Grid size={{ xs: 12, md: 6, lg: 3 }} key={agent.id}>
             <Paper sx={{ p: 3, borderRadius: 4, position: 'relative' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                 <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), color: 'primary.main', borderRadius: 2 }}>

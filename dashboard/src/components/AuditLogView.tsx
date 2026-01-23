@@ -56,7 +56,7 @@ export default function AuditLogView() {
     fetchTransactions();
   }, [fetchTransactions]);
 
-  const displayTransactions = transactions.length > 0 ? transactions : [
+  const displayTransactions: Transaction[] = transactions.length > 0 ? transactions : [
     { id: '1', timestamp: '2023-10-24 14:22:10', agentId: 'AGT-8821-X9', merchantDomain: 'aws.amazon.com', merchant: 'AWS', amount: 1420.00, currency: 'USDC', status: 'SETTLED', hash: '0x4a2e881b7723c3399021da3b8812c99a0122ff10...' },
     { id: '2', timestamp: '2023-10-24 14:18:05', agentId: 'AGT-9902-Z4', merchantDomain: 'cloud.google.com', merchant: 'Google Cloud', amount: 890.50, currency: 'USDC', status: 'SETTLED', hash: '0x7b2f992c8834d4400132eb4c9923d00b123ff21...' },
     { id: '3', timestamp: '2023-10-24 14:05:42', agentId: 'AGT-1122-K1', merchantDomain: 'openai.com', merchant: 'OpenAI', amount: 320.12, currency: 'USDC', status: 'SETTLED', hash: '0x1c3a445d6677e8899223fa4c5566f11c234ee32...' },
