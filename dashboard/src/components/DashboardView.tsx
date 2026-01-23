@@ -14,7 +14,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  CircularProgress
+  CircularProgress,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { 
   XAxis, 
@@ -49,12 +51,13 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
   <Paper 
     elevation={0}
     sx={{ 
-      p: 3, 
+      p: { xs: 2, md: 3 }, 
       borderRadius: 4, 
       position: 'relative', 
       overflow: 'hidden',
       '&:hover .icon-bg': { opacity: 0.15 },
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      height: '100%'
     }}
   >
     <Box 
@@ -66,28 +69,31 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
         p: 2, 
         opacity: 0.08, 
         transition: 'opacity 0.3s ease',
-        color: 'primary.main'
+        color: 'primary.main',
+        display: { xs: 'none', sm: 'block' }
       }}
     >
-      <Icon size={64} />
+      <Icon size={isMobile ? 48 : 64} />
     </Box>
     <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', tracking: '0.15em', mb: 1 }}>
       {title}
     </Typography>
-    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-      <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>${value}</Typography>
-      {unit && <Typography sx={{ fontSize: 14, fontWeight: 800, color: 'text.secondary' }}>{unit}</Typography>}
+    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, flexWrap: 'wrap' }}>
+      <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em', fontSize: { xs: '1.5rem', md: '2.125rem' } }}>${value}</Typography>
+      {unit && <Typography sx={{ fontSize: 12, fontWeight: 800, color: 'text.secondary' }}>{unit}</Typography>}
     </Box>
     <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Typography sx={{ fontSize: 12, fontWeight: 800, color: change.startsWith('+') ? 'primary.main' : '#ef4444' }}>
+      <Typography sx={{ fontSize: 11, fontWeight: 800, color: change.startsWith('+') ? 'primary.main' : '#ef4444' }}>
         {change}
       </Typography>
-      <Typography sx={{ fontSize: 12, color: 'text.secondary', fontWeight: 600 }}>from yesterday</Typography>
+      <Typography sx={{ fontSize: 11, color: 'text.secondary', fontWeight: 600 }}>from yesterday</Typography>
     </Box>
   </Paper>
 );
 
 export default function DashboardView() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -244,11 +250,11 @@ export default function DashboardView() {
         </Grid>
       </Grid>
 
-      <Paper elevation={0} sx={{ p: 4, borderRadius: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'primary.main' }}>
             <Zap size={20} style={{ animation: 'pulse-light 2s infinite' }} />
-            <Typography variant="h6" sx={{ fontWeight: 800 }}>Real-Time Snaps</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 800, fontSize: { xs: '1rem', md: '1.25rem' } }}>Real-Time Snaps</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Stream Active</Typography>
@@ -256,13 +262,13 @@ export default function DashboardView() {
           </Box>
         </Box>
 
-        <TableContainer sx={{ position: 'relative', minHeight: 200 }}>
+        <TableContainer sx={{ position: 'relative', minHeight: 200, overflowX: 'auto' }}>
           {loading && transactions.length === 0 && (
             <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
               <CircularProgress size={24} sx={{ color: 'primary.main' }} />
             </Box>
           )}
-          <Table sx={{ minWidth: 650 }}>
+          <Table sx={{ minWidth: { xs: 800, md: 650 } }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontSize: 10, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid rgba(16, 185, 129, 0.1)' }}>Merchant / Entity</TableCell>
