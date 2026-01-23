@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Container, Grid, Box } from '@mui/material';
+import { Container, Grid, Box, Typography } from '@mui/material';
 import DashboardHeader from '@/components/DashboardHeader';
 import StatsCards from '@/components/StatsCards';
 import ActivityFeed from '@/components/ActivityFeed';
@@ -19,6 +19,7 @@ export default function Dashboard() {
 
     try {
       const apiHost = process.env.NEXT_PUBLIC_ENGINE_URL || 'http://localhost:3000';
+      console.log('Connecting to Crokodile Engine at:', apiHost);
       const response = await fetch(`${apiHost}/transactions`, { signal: controller.signal });
       
       clearTimeout(id);
@@ -50,17 +51,28 @@ export default function Dashboard() {
       <DashboardHeader error={error} onRefresh={fetchTransactions} />
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Grid container spacing={3}>
-          <StatsCards transactions={transactions} />
+        {error && (
+          <Box sx={{ mb: 2, p: 2, border: '1px solid #ff0000', bgcolor: 'rgba(255, 0, 0, 0.05)' }}>
+            <Typography color="error" sx={{ fontFamily: 'monospace' }}>SYSTEM_ERROR: {error}</Typography>
+          </Box>
+        )}
+        {loading && transactions.length === 0 ? (
+           <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
+              <Typography color="#00ffff" sx={{ fontFamily: 'monospace' }}>INITIALIZING_SECURE_CONNECTION...</Typography>
+           </Box>
+        ) : (
+          <Grid container spacing={3}>
+            <StatsCards transactions={transactions} />
 
-          <Grid size={{ xs: 12, md: 8 }}>
-            <ActivityFeed transactions={transactions} loading={loading} />
-          </Grid>
+            <Grid size={{ xs: 12, md: 8 }}>
+              <ActivityFeed transactions={transactions} loading={loading} />
+            </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
-            <PolicyPanel transactions={transactions} />
+            <Grid size={{ xs: 12, md: 4 }}>
+              <PolicyPanel transactions={transactions} />
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </Container>
     </Box>
   );
