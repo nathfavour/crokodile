@@ -55,12 +55,15 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.Color("240")),
 		Bold(false)
+	
+	// Fixed: Use correct style methods
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")),
 		Background(accentColor).
 		Bold(false)
+	
 t.SetStyles(s)
 
 	return model{
@@ -120,8 +123,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if l.Paid {
 				paid = "0.01 USDC"
 			}
-		
-rows = append(rows, table.Row{
+		ows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
 				l.Method,
 				l.URL,
@@ -174,18 +176,17 @@ func (m model) View() string {
 		Render(sidebarContent)
 
 	// Main Content
-	tableHeader := headerStyle.Render("LIVE INTERCEPTION TRAFFIC")
-	logContent := lipgloss.JoinVertical(lipgloss.Left,
-		tableHeader,
-		m.table.View(),
-	)
-
 	logTable := lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder()).
 		BorderForeground(accentColor).
 		Width(mainWidth).
 		Padding(1).
-		Render(logContent)
+		Render(
+			lipgloss.JoinVertical(lipgloss.Left,
+				headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
+				m.table.View(),
+			),
+		)
 
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
