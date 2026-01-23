@@ -1,75 +1,64 @@
-# 🐊 CROKODILE
+# 🐊 CROKODILE | cronos-x402-v2.0.4-pro
 
-**The Agentic x402 Proxy.** Intercept `402 Payment Required`, negotiate gasless EIP-3009 payments, and retry requests transparently.
+> **Autonomous Machine-to-Machine (M2M) Payment Proxy & Ledger**
 
----
+Crokodile is an Agentic Proxy ecosystem that enables AI agents to autonomously negotiate and settle `402 Payment Required` HTTP status codes. It bridges the gap between the value-locked web and autonomous compute.
 
-## 🛠️ Components
+![CROKODILE CLI](https://img.shields.io/badge/UI-BubbleTea-10b981?style=for-the-badge)
+![Built with Go](https://img.shields.io/badge/Language-Go-00ADD8?style=for-the-badge&logo=go)
+![Dashboard](https://img.shields.io/badge/Dashboard-Next.js-000000?style=for-the-badge&logo=next.js)
 
-- **🦷 The Jaw (Go CLI):** Transparent proxy intercepting traffic and retrying 402s.
-- **🧠 The Brain (Engine):** TS/Appwrite backend signing transactions & enforcing policies.
-- **👁️ The Eye (Dashboard):** Next.js interface for monitoring automated settlements.
+## 🏗️ Architecture
+
+### 1. 🫦 The Jaw (Go CLI)
+A high-performance transparent proxy built with **Go** and **Bubble Tea**.
+- **TUI Dashboard**: Real-time visualization of intercepted 402 traffic.
+- **Transparent Interception**: Respects `HTTP_PROXY` environment variables.
+- **Auto-Negotiation**: Handshakes with the Brain to settle payments via EIP-3009.
+
+### 2. 🧠 The Brain (Next.js API)
+A centralized policy and settlement hub.
+- **Reasoning Audit**: Uses **Gemini 1.5 Flash** to audit agent spending justifications.
+- **Policy Enforcement**: Guardrails for daily budgets and per-request limits.
+- **Gasless Settlement**: Simulation of EIP-3009 USDC transfers on Cronos.
+
+### 3. 👁️ The Eye (MUI Dashboard)
+A sleek, technical-premium monitoring interface at [crokodile-nathfavour02.vercel.app](https://crokodile-nathfavour02.vercel.app).
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Installation
-
-#### 🐧 Linux / 🍎 macOS / 🤖 Android
+### Installation
 ```bash
-curl -fsSL https://crokodile.vercel.app/install.sh | bash
-```
-
-#### 🏗️ From Source
-```bash
-git clone https://github.com/nathfavour/crokodile.git
-cd crokodile
 make install
 make build
 ```
 
-### 2. Launch Services
-Start the **Brain** and **Mock Merchant** (separate terminals):
+### Running the CLI
+Run the proxy and monitor traffic via the TUI:
 ```bash
-make dev-brain     # Engine (Port 3000)
-make dev-merchant  # Test API (Port 4000)
+./bin/crok
 ```
 
-### 3. Run the Proxy
-Intercept any command (e.g., `curl`):
+### Running an Agent Command
+Run any command (like a Python agent or curl) through the Crokodile tunnel:
 ```bash
-make run CMD="curl http://localhost:4000/data"
-```
-
----
-
-## 📦 Building from Source
-
-Build the CLI binary for your local machine:
-```bash
-make build
-# Binary created at ./bin/crok
-```
-
-### 📱 Cross-Platform Releases
-Automated via GoReleaser. Supports **Linux, Windows, macOS, and Android**.
-
-```bash
-git tag -a v0.1.0 -m "Release message"
-git push origin v0.1.0
+./bin/crok run "curl http://localhost:3000/api/mock-merchant"
 ```
 
 ---
 
-## 📊 Monitoring
-View real-time transaction activity:
-```bash
-make dev-dashboard
-# Visit http://localhost:3001
-```
+## 🛠️ Development
+
+- **Next.js App**: `cd dashboard && npm run dev`
+- **Go CLI**: `make build`
+- **Test End-to-End**: `./test-flow.sh`
 
 ---
 
-## 📄 License
-MIT © 2026 [nathfavour](https://github.com/nathfavour)
+## 🛡️ Security & Privacy
+- **Isolation**: The CLI never sees your private keys; it only receives signed payment proofs from the Brain.
+- **Auditability**: Every cent spent by an agent is backed by an AI-audited "Reasoning Trace."
+
+© 2026 CROKODILE SECURE PROTOCOL • X402_COMPLIANT_NODE

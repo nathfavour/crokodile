@@ -5,17 +5,22 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var (
-	version = "dev"
+	version = "2.0.4-pro"
 	commit  = "none"
 	date    = "unknown"
 )
 
 func main() {
 	proxyPort := flag.String("port", ":8080", "Port to run the proxy on")
-	engineURL := flag.String("engine", "http://localhost:3000", "URL of the Crokodile engine")
+	engineURL := flag.String("engine", "https://crokodile-nathfavour02.vercel.app", "URL of the Crokodile engine")
+	agentID := flag.String("id", "AGT-LOCAL-001", "Agent ID for this node")
+	agentName := flag.String("name", "Local_Intercept_Node", "Display name for this agent")
+	noTUI := flag.Bool("no-tui", false, "Disable TUI and run in headless mode")
 	showVersion := flag.Bool("version", false, "Show version information")
 	flag.Parse()
 
@@ -24,7 +29,6 @@ func main() {
 		return
 	}
 
-	// Override with env vars if present
 	if envPort := os.Getenv("CROKODILE_PROXY_PORT"); envPort != "" {
 		*proxyPort = envPort
 	}
@@ -35,6 +39,13 @@ func main() {
 	engine := NewEngineClient(*engineURL)
 	proxy := NewProxyServer(*proxyPort, engine)
 
+	// Attempt registration
+	fmt.Printf("Registering agent %s with engine %s...\n", *agentID, *engineURL)
+	err := engine.Register(*agentID, *agentName, version)
+	if err != nil {
+		fmt.Printf("⚠️  Registration warning: %v (running in unlinked mode)\n", err)
+	}
+
 	args := flag.Args()
 	if len(args) > 0 && args[0] == "run" {
 		if len(args) < 2 {
@@ -42,14 +53,12 @@ func main() {
 			os.Exit(1)
 		}
 
-		// Run proxy in background
 		go func() {
 			if err := proxy.Start(); err != nil {
 				log.Fatalf("Proxy failed: %v", err)
 			}
 		}()
 
-		// Run the command through the proxy
 		err := RunWithProxy(args[1], *proxyPort)
 		if err != nil {
 			fmt.Printf("Command failed: %v\n", err)
@@ -58,8 +67,24 @@ func main() {
 		return
 	}
 
-	// Default: just run the proxy
-	if err := proxy.Start(); err != nil {
-		log.Fatalf("Failed to start proxy: %v", err)
+	if *noTUI {
+		fmt.Printf("🐊 CROKODILE Proxy active on %s (HEADLESS)\n", *proxyPort)
+		if err := proxy.Start(); err != nil {
+			log.Fatalf("Failed to start proxy: %v", err)
+		}
+		return
+	}
+
+	// Run TUI
+	go func() {
+		if err := proxy.Start(); err != nil {
+			// TUI handles errors via status updates
+		}
+	}()
+
+	p := tea.NewProgram(initialModel(proxy, engine, *agentID), tea.WithAltScreen())
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("Alas, there's been an error: %v", err)
+		os.Exit(1)
 	}
 }

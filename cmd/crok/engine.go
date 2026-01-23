@@ -16,7 +16,7 @@ type EngineClient struct {
 func NewEngineClient(endpoint string) *EngineClient {
 	return &EngineClient{
 		Endpoint: endpoint,
-		Client:   &http.Client{Timeout: 10 * time.Second},
+		Client:   &http.Client{Timeout: 15 * time.Second},
 	}
 }
 
@@ -44,4 +44,29 @@ func (c *EngineClient) RequestPayment(payload PaymentPayload) (*PaymentResponse,
 	}
 
 	return &payResp, nil
+}
+
+func (c *EngineClient) Register(agentID, agentName, version string) error {
+	payload := RegisterPayload{
+		AgentID:   agentID,
+		AgentName: agentName,
+		Version:   version,
+	}
+
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.Client.Post(c.Endpoint+"/api/policies", "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("registration failed with status: %d", resp.StatusCode)
+	}
+
+	return nil
 }
