@@ -94,6 +94,10 @@ export default function AppLayout() {
     setTimeout(() => setAIStep(4), 4500);
   };
 
+  React.useEffect(() => {
+    if (cliModalOpen) startDetecting();
+  }, [cliModalOpen]);
+
   return (
     <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh', pb: isMobile ? 8 : 0 }}>
       {/* Sidebar - Desktop Only */}
