@@ -16,8 +16,9 @@ export async function POST(request: Request) {
 
     const result = await processPayment(body, config);
     return NextResponse.json(result);
-  } catch (err: any) {
-    console.error('Payment API Error:', err.message);
-    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+  } catch (err) {
+    const error = err as Error;
+    console.error('Payment API Error:', error.message);
+    return NextResponse.json({ success: false, message: error.message }, { status: 400 });
   }
 }

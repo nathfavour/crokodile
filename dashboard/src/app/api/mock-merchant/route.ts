@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
   const auth = request.headers.get('X-402-Payment-Proof') || request.headers.get('Authorization');
 
   if (!auth) {
