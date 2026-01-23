@@ -14,9 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  CircularProgress,
-  useTheme,
-  useMediaQuery
+  CircularProgress
 } from '@mui/material';
 import { 
   XAxis, 
@@ -73,7 +71,7 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
         display: { xs: 'none', sm: 'block' }
       }}
     >
-      <Icon size={isMobile ? 48 : 64} />
+      <Icon size={64} />
     </Box>
     <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', tracking: '0.15em', mb: 1 }}>
       {title}
@@ -92,8 +90,6 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
 );
 
 export default function DashboardView() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [loading, setLoading] = React.useState(true);
 

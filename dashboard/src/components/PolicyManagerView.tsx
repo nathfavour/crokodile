@@ -12,7 +12,12 @@ import {
   Chip,
   TextField,
   InputAdornment,
-  CircularProgress
+  CircularProgress,
+  useTheme,
+  useMediaQuery,
+  Dialog,
+  DialogContent,
+  IconButton
 } from '@mui/material';
 import { 
   Bot, 
@@ -22,8 +27,6 @@ import {
   Settings, 
   Activity, 
   Save, 
-  RotateCcw,
-  AlertTriangle,
   X
 } from 'lucide-react';
 import { Agent } from '@/app/types';
@@ -492,7 +495,19 @@ export default function PolicyManagerView() {
 
 
 
-function PolicyEditor({ agent, onSave, saving, setEditingAgent, newDomain, setNewDomain, handleAddDomain, removeDomain, onClose }: any) {
+interface PolicyEditorProps {
+  agent: Agent;
+  onSave: () => Promise<void>;
+  saving: boolean;
+  setEditingAgent: (agent: Agent) => void;
+  newDomain: string;
+  setNewDomain: (domain: string) => void;
+  handleAddDomain: () => void;
+  removeDomain: (domain: string) => void;
+  onClose: () => void;
+}
+
+function PolicyEditor({ agent, onSave, saving, setEditingAgent, newDomain, setNewDomain, handleAddDomain, removeDomain, onClose }: PolicyEditorProps) {
 
   return (
 

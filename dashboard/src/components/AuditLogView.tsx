@@ -26,11 +26,8 @@ import {
   Search, 
   ChevronDown, 
   X, 
-  Copy, 
   ExternalLink,
-  ShieldCheck,
-  Activity,
-  Zap
+  ShieldCheck
 } from 'lucide-react';
 import { Transaction } from '@/app/types';
 import { generateForensicTrace } from '@/services/geminiService';
@@ -63,10 +60,10 @@ export default function AuditLogView() {
   }, [fetchTransactions]);
 
   const displayTransactions: Transaction[] = transactions.length > 0 ? transactions : [
-    { id: '1', timestamp: '2023-10-24 14:22:10', agentId: 'AGT-8821-X9', merchantDomain: 'aws.amazon.com', merchant: 'AWS', amount: 1420.00, currency: 'USDC', status: 'SETTLED', hash: '0x4a2e881b7723c3399021da3b8812c99a0122ff10...', merchantDomain: '', reasoning: '', time: '' },
-    { id: '2', timestamp: '2023-10-24 14:18:05', agentId: 'AGT-9902-Z4', merchantDomain: 'cloud.google.com', merchant: 'Google Cloud', amount: 890.50, currency: 'USDC', status: 'SETTLED', hash: '0x7b2f992c8834d4400132eb4c9923d00b123ff21...', merchantDomain: '', reasoning: '', time: '' },
-    { id: '3', timestamp: '2023-10-24 14:05:42', agentId: 'AGT-1122-K1', merchantDomain: 'openai.com', merchant: 'OpenAI', amount: 320.12, currency: 'USDC', status: 'SETTLED', hash: '0x1c3a445d6677e8899223fa4c5566f11c234ee32...', merchantDomain: '', reasoning: '', time: '' },
-    { id: '4', timestamp: '2023-10-24 13:58:12', agentId: 'AGT-5541-M0', merchantDomain: 'stripe.com', merchant: 'Stripe', amount: 15.00, currency: 'USDC', status: 'SETTLED', hash: '0x9d2e112b3344c5566778ab9c1122d33e445ff66...', merchantDomain: '', reasoning: '', time: '' },
+    { id: '1', timestamp: '2023-10-24 14:22:10', agentId: 'AGT-8821-X9', merchantDomain: 'aws.amazon.com', merchant: 'AWS', amount: 1420.00, currency: 'USDC', status: 'SETTLED', hash: '0x4a2e881b7723c3399021da3b8812c99a0122ff10...', reasoning: '', time: '' },
+    { id: '2', timestamp: '2023-10-24 14:18:05', agentId: 'AGT-9902-Z4', merchantDomain: 'cloud.google.com', merchant: 'Google Cloud', amount: 890.50, currency: 'USDC', status: 'SETTLED', hash: '0x7b2f992c8834d4400132eb4c9923d00b123ff21...', reasoning: '', time: '' },
+    { id: '3', timestamp: '2023-10-24 14:05:42', agentId: 'AGT-1122-K1', merchantDomain: 'openai.com', merchant: 'OpenAI', amount: 320.12, currency: 'USDC', status: 'SETTLED', hash: '0x1c3a445d6677e8899223fa4c5566f11c234ee32...', reasoning: '', time: '' },
+    { id: '4', timestamp: '2023-10-24 13:58:12', agentId: 'AGT-5541-M0', merchantDomain: 'stripe.com', merchant: 'Stripe', amount: 15.00, currency: 'USDC', status: 'SETTLED', hash: '0x9d2e112b3344c5566778ab9c1122d33e445ff66...', reasoning: '', time: '' },
   ];
 
   const fetchTrace = async (tx: Transaction) => {

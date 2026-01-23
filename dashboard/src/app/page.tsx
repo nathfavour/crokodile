@@ -15,7 +15,6 @@ import {
   Toolbar, 
   Avatar, 
   InputBase, 
-  Badge,
   alpha,
   Button,
   Container,
@@ -28,7 +27,10 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
-  Tooltip
+  Tooltip,
+  TextField,
+  InputAdornment,
+  CircularProgress
 } from '@mui/material';
 import { 
   LayoutDashboard, 
@@ -36,16 +38,18 @@ import {
   History, 
   Activity, 
   Server,
-  Settings,
-  Plus,
-  Search,
-  Bell,
   Terminal,
   Copy,
   Check,
   Cpu,
   Wifi,
-  Zap
+  Zap,
+  Search,
+  Wand2,
+  Share2,
+  X,
+  Sparkles,
+  Link as LinkIcon
 } from 'lucide-react';
 import DashboardView from '@/components/DashboardView';
 import AuditLogView from '@/components/AuditLogView';
@@ -60,8 +64,11 @@ export default function AppLayout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [currentView, setCurrentView] = React.useState<ViewType>('DASHBOARD');
   const [cliModalOpen, setCliModalOpen] = React.useState(false);
+  const [payModalOpen, setPayModalOpen] = React.useState(false);
+  const [aiModalOpen, setAIModalOpen] = React.useState(false);
   const [detecting, setDetecting] = React.useState(false);
   const [copySuccess, setCopySuccess] = React.useState(false);
+  const [aiStep, setAIStep] = React.useState(0);
 
   const installCmd = "curl -sL https://crokodile.vercel.app/install.sh | sh";
 
@@ -73,20 +80,24 @@ export default function AppLayout() {
     { id: 'SYSTEM' as ViewType, label: 'System', icon: Server },
   ];
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(installCmd);
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  const startDetection = () => {
+  const startDetecting = () => {
     setDetecting(true);
-    setTimeout(() => setDetecting(false), 4000);
+    setTimeout(() => setDetecting(false), 3000);
   };
 
-  React.useEffect(() => {
-    if (cliModalOpen) startDetection();
-  }, [cliModalOpen]);
+  const runAISimulation = () => {
+    setAIModalOpen(true);
+    setAIStep(1);
+    setTimeout(() => setAIStep(2), 1500);
+    setTimeout(() => setAIStep(3), 3000);
+    setTimeout(() => setAIStep(4), 4500);
+  };
 
   return (
     <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh', pb: isMobile ? 8 : 0 }}>
@@ -161,18 +172,20 @@ export default function AppLayout() {
 
           <Box sx={{ mt: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button 
+              variant="outlined" 
+              fullWidth 
+              onClick={() => setPayModalOpen(true)}
+              startIcon={<Share2 size={18} />}
+              sx={{ py: 1.2, borderRadius: 3, fontWeight: 800, fontSize: 12, borderColor: 'rgba(16, 185, 129, 0.3)' }}
+            >
+              Payment Request
+            </Button>
+            <Button 
               variant="contained" 
               fullWidth 
               onClick={() => setCliModalOpen(true)}
               startIcon={<Terminal size={18} />}
-              sx={{ 
-                py: 1.5, 
-                borderRadius: 3,
-                fontWeight: 800,
-                fontSize: 13,
-                boxShadow: '0 8px 16px rgba(16, 185, 129, 0.1)',
-                textTransform: 'uppercase'
-              }}
+              sx={{ py: 1.5, borderRadius: 3, fontWeight: 800, fontSize: 13, boxShadow: '0 8px 16px rgba(16, 185, 129, 0.1)' }}
             >
               Connect CLI
             </Button>
@@ -201,42 +214,33 @@ export default function AppLayout() {
             )}
             
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, md: 4 }, flexGrow: 1 }}>
+              <Tooltip title="AI Optimization Autopilot">
+                <IconButton 
+                  onClick={runAISimulation}
+                  sx={{ 
+                    color: 'primary.main', 
+                    bgcolor: alpha('#10b981', 0.1),
+                    '&:hover': { bgcolor: alpha('#10b981', 0.2) },
+                    animation: 'glow 3s infinite'
+                  }}
+                >
+                  <Wand2 size={20} />
+                </IconButton>
+              </Tooltip>
               {!isMobile && (
-                <>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, color: 'text.secondary' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box className="pulse-indicator" sx={{ width: 8, height: 8, bgcolor: 'primary.main', borderRadius: '50%' }} />
-                    <Typography sx={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'primary.main' }}>
-                      System Online
-                    </Typography>
+                    <Typography sx={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Nodes: 42</Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, color: 'text.secondary' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Activity size={14} color="#059669" />
-                      <Typography sx={{ fontSize: 11, fontWeight: 700 }}>12ms</Typography>
-                    </Box>
-                  </Box>
-                </>
+                </Box>
               )}
             </Box>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
               {!isMobile && (
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  bgcolor: '#0c1a15', 
-                  border: '1px solid rgba(16, 185, 129, 0.2)', 
-                  borderRadius: 2,
-                  px: 2,
-                  width: 200,
-                  transition: 'all 0.2s',
-                  '&:focus-within': { width: 280, borderColor: 'primary.main' }
-                }}>
-                  <Search size={16} color="#94a3b8" />
-                  <InputBase 
-                    placeholder="Search Node" 
-                    sx={{ ml: 1, flex: 1, fontSize: 12, color: 'text.primary' }} 
-                  />
+                <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
+                  <Chip icon={<Sparkles size={14} />} label="AI_ONLINE" size="small" variant="outlined" sx={{ color: 'primary.main', borderColor: alpha('#10b981', 0.3), fontWeight: 800, fontSize: 10 }} />
                 </Box>
               )}
 
@@ -250,14 +254,13 @@ export default function AppLayout() {
                   fontSize: { xs: 10, md: 12 },
                   fontWeight: 800,
                   bgcolor: 'primary.main',
-                  color: '#000',
-                  '&:hover': { bgcolor: 'primary.light' }
+                  color: '#000'
                 }}
               >
-                CONNECT CLI
+                CONNECT
               </Button>
 
-              <Avatar src="https://picsum.photos/seed/user/32" sx={{ width: { xs: 32, md: 32 }, height: { xs: 32, md: 32 }, border: '1px solid rgba(16, 185, 129, 0.3)' }} />
+              <Avatar src="https://picsum.photos/seed/user/32" sx={{ width: 32, height: 32, border: '1px solid rgba(16, 185, 129, 0.3)' }} />
             </Box>
           </Toolbar>
         </AppBar>
@@ -271,8 +274,8 @@ export default function AppLayout() {
             {currentView === 'LEDGER' && <FleetStatusView />}
             {currentView === 'SYSTEM' && (
               <Box sx={{ py: 10, textAlign: 'center', color: 'text.secondary' }}>
-                <Typography variant="h6">System Diagnostics Online</Typography>
-                <Typography variant="body2">Advanced node health metrics coming in v2.1</Typography>
+                <Typography variant="h6">System Diagnostics v2.0.4</Typography>
+                <Typography variant="body2">Security kernel status: OPTIMAL</Typography>
               </Box>
             )}
           </Container>
@@ -294,111 +297,88 @@ export default function AppLayout() {
                 label={item.label}
                 value={item.id}
                 icon={<item.icon size={20} />}
-                sx={{ 
-                  color: 'text.secondary',
-                  '&.Mui-selected': { color: 'primary.main' },
-                  '& .MuiBottomNavigationAction-label': { fontSize: 10, fontWeight: 700, mt: 0.5 }
-                }}
+                sx={{ color: 'text.secondary', '&.Mui-selected': { color: 'primary.main' } }}
               />
             ))}
           </BottomNavigation>
         </Paper>
       )}
 
+      {/* AI Simulation Modal */}
+      <Dialog open={aiModalOpen} onClose={() => setAIModalOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { bgcolor: '#08120e', border: '1px solid #10b981', borderRadius: 4 } }}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 2, pt: 4 }}>
+          <Wand2 color="#10b981" />
+          <Typography variant="h6" sx={{ fontWeight: 900 }}>AI Optimization</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pb: 4 }}>
+          <Box sx={{ minHeight: 200, display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <CircularProgress size={20} sx={{ color: aiStep >= 1 ? '#10b981' : '#333' }} variant={aiStep > 1 ? "determinate" : "indeterminate"} value={100} />
+              <Typography sx={{ fontSize: 13, color: aiStep >= 1 ? '#fff' : '#555', fontWeight: aiStep === 1 ? 800 : 400 }}>Scanning fleet behavioral patterns...</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <CircularProgress size={20} sx={{ color: aiStep >= 2 ? '#10b981' : '#333' }} variant={aiStep > 2 ? "determinate" : "indeterminate"} value={100} />
+              <Typography sx={{ fontSize: 13, color: aiStep >= 2 ? '#fff' : '#555', fontWeight: aiStep === 2 ? 800 : 400 }}>Generating new risk guardrails...</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <CircularProgress size={20} sx={{ color: aiStep >= 3 ? '#10b981' : '#333' }} variant={aiStep > 3 ? "determinate" : "indeterminate"} value={100} />
+              <Typography sx={{ fontSize: 13, color: aiStep >= 3 ? '#fff' : '#555', fontWeight: aiStep === 3 ? 800 : 400 }}>Propagating policies to local nodes...</Typography>
+            </Box>
+            {aiStep >= 4 && (
+              <Box sx={{ p: 2, bgcolor: alpha('#10b981', 0.1), borderRadius: 2, border: '1px solid #10b981' }}>
+                <Typography sx={{ fontSize: 12, color: '#10b981', fontWeight: 800 }}>SUCCESS: Fleet efficiency improved by 14.2%.</Typography>
+              </Box>
+            )}
+          </Box>
+          <Button fullWidth variant="contained" disabled={aiStep < 4} onClick={() => setAIModalOpen(false)} sx={{ mt: 2 }}>Close</Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Request Modal */}
+      <Dialog open={payModalOpen} onClose={() => setPayModalOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: '#08120e', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 4 } }}>
+        <DialogTitle sx={{ px: 4, pt: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <LinkIcon color="#10b981" size={24} />
+          <Typography variant="h5" sx={{ fontWeight: 900 }}>Create Payment URI</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ px: 4, pb: 4 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2 }}>
+            <TextField fullWidth label="Amount" defaultValue="0.01" InputProps={{ startAdornment: <InputAdornment position="start">USDC</InputAdornment> }} />
+            <TextField fullWidth label="Merchant ID" defaultValue="mock-merchant-042" />
+            <Box sx={{ p: 2, bgcolor: '#000', borderRadius: 2, border: '1px solid #333' }}>
+              <Typography sx={{ color: '#10b981', fontSize: 12, fontFamily: 'monospace' }}>crok://pay?amt=0.01&m=mock-merchant-042&c=USDC</Typography>
+            </Box>
+            <Button variant="contained" onClick={() => handleCopy("crok://pay?amt=0.01&m=mock-merchant-042&c=USDC")} startIcon={copySuccess ? <Check size={18} /> : <Copy size={18} />}>
+              {copySuccess ? "Copied Request URI" : "Copy Payment URI"}
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+
       {/* Connect CLI Modal */}
-      <Dialog 
-        open={cliModalOpen} 
-        onClose={() => setCliModalOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            bgcolor: '#08120e',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            borderRadius: 4,
-            backgroundImage: 'radial-gradient(circle at top right, rgba(16, 185, 129, 0.05), transparent)'
-          }
-        }}
-      >
-        <DialogTitle sx={{ px: 4, pt: 4, pb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Dialog open={cliModalOpen} onClose={() => setCliModalOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: '#08120e', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 4 } }}>
+        <DialogTitle sx={{ px: 4, pt: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
           <Terminal color="#10b981" size={24} />
           <Typography variant="h5" sx={{ fontWeight: 900 }}>Link Local CLI</Typography>
         </DialogTitle>
         <DialogContent sx={{ px: 4, pb: 4 }}>
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
-              Unlock the full power of machine-to-machine commerce. Install the Crokodile Jaw on your local node to start intercepting 402 traffic.
-            </Typography>
-
-            <Box sx={{ bgcolor: '#000', p: 2.5, borderRadius: 3, border: '1px solid rgba(16, 185, 129, 0.1)', position: 'relative' }}>
-              <Typography sx={{ color: '#10b981', fontFamily: 'JetBrains Mono, monospace', fontSize: 13, pr: 5, wordBreak: 'break-all' }}>
-                {installCmd}
+          <Box sx={{ mb: 4, mt: 2 }}>
+            <Box sx={{ bgcolor: '#000', p: 2.5, borderRadius: 3, border: '1px solid #10b981', position: 'relative' }}>
+              <Typography sx={{ color: '#10b981', fontFamily: 'monospace', fontSize: 13 }}>{installCmd}</Typography>
+              <IconButton onClick={() => handleCopy(installCmd)} sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: '#10b981' }}>
+                <Copy size={18} />
+              </IconButton>
+            </Box>
+          </Box>
+          <Box sx={{ p: 3, borderRadius: 3, bgcolor: alpha('#10b981', 0.03), border: '1px solid #10b981' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 800, color: detecting ? 'primary.main' : 'text.secondary' }}>
+                {detecting ? 'DETECTING LOCAL NODES...' : 'CLI BRIDGE READY'}
               </Typography>
-              <Tooltip title={copySuccess ? "Copied!" : "Copy Command"}>
-                <IconButton 
-                  onClick={handleCopy}
-                  sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: copySuccess ? 'primary.main' : 'text.secondary' }}
-                >
-                  {copySuccess ? <Check size={18} /> : <Copy size={18} />}
-                </IconButton>
-              </Tooltip>
+              {detecting && <CircularProgress size={16} />}
             </Box>
+            <LinearProgress variant={detecting ? "indeterminate" : "determinate"} value={100} sx={{ height: 4, borderRadius: 2 }} />
           </Box>
-
-          <Box sx={{ 
-            p: 3, 
-            borderRadius: 3, 
-            bgcolor: alpha('#10b981', 0.03), 
-            border: '1px solid rgba(16, 185, 129, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2
-          }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Wifi size={16} color={detecting ? "#10b981" : "#94a3b8"} className={detecting ? "pulse-indicator" : ""} />
-                <Typography sx={{ fontSize: 12, fontWeight: 800, color: detecting ? 'primary.main' : 'text.secondary' }}>
-                  {detecting ? 'DETECTING LOCAL NODES...' : 'CLI BRIDGE READY'}
-                </Typography>
-              </Box>
-              {detecting && <Typography sx={{ fontSize: 10, fontWeight: 900, color: 'primary.main' }}>ROLLING...</Typography>}
-            </Box>
-            
-            <Box sx={{ position: 'relative', height: 4, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' }}>
-              {detecting ? (
-                <LinearProgress 
-                  sx={{ 
-                    height: 4, 
-                    bgcolor: 'transparent',
-                    '& .MuiLinearProgress-bar': { bgcolor: 'primary.main' }
-                  }} 
-                />
-              ) : (
-                <Box sx={{ width: '100%', height: '100%', bgcolor: 'rgba(16, 185, 129, 0.2)' }} />
-              )}
-            </Box>
-
-            <Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Cpu size={14} color="#10b981" opacity={0.5} />
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>LOCAL_ADDR: 127.0.0.1:8080</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Zap size={14} color="#10b981" opacity={0.5} />
-                <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary' }}>AUTO_SYNC: ON</Typography>
-              </Box>
-            </Box>
-          </Box>
-
-          <Button 
-            fullWidth 
-            variant="contained" 
-            size="large"
-            onClick={() => setCliModalOpen(false)}
-            sx={{ mt: 4, py: 2, borderRadius: 3, fontWeight: 900, fontSize: 14 }}
-          >
-            I'VE INSTALLED THE CLI
-          </Button>
+          <Button fullWidth variant="contained" size="large" onClick={() => setCliModalOpen(false)} sx={{ mt: 4, fontWeight: 900 }}>I&apos;VE INSTALLED THE CLI</Button>
         </DialogContent>
       </Dialog>
 
@@ -407,6 +387,11 @@ export default function AppLayout() {
           0% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.4; transform: scale(0.8); }
           100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes glow {
+          0% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); }
+          50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+          100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); }
         }
         .pulse-indicator {
           animation: pulse 2s infinite;

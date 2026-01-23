@@ -29,34 +29,34 @@ export default function FleetStatusView() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <Box>
-        <Typography variant="h4" sx={{ fontWeight: 800 }}>Fleet Status</Typography>
+        <Typography variant="h4" sx={{ fontWeight: 800, fontSize: { xs: '1.5rem', md: '2.125rem' } }}>Fleet Status</Typography>
         <Typography sx={{ fontSize: 14, color: 'text.secondary', mt: 1, fontWeight: 500 }}>
-          Real-time monitoring of autonomous agent nodes across the Cronos network.
+          Monitoring of autonomous agent nodes across the network.
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         {agents.map((agent) => (
-          <Grid size={{ xs: 12, md: 6, lg: 3 }} key={agent.id}>
-            <Paper sx={{ p: 3, borderRadius: 4, position: 'relative' }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={agent.id}>
+            <Paper sx={{ p: 2.5, borderRadius: 4, position: 'relative' }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), color: 'primary.main', borderRadius: 2 }}>
-                  <Cpu size={20} />
+                <Avatar sx={{ bgcolor: alpha('#10b981', 0.1), color: 'primary.main', borderRadius: 2, width: 36, height: 36 }}>
+                  <Cpu size={18} />
                 </Avatar>
                 <IconButton size="small" sx={{ color: 'text.secondary' }}>
                   <MoreVertical size={16} />
                 </IconButton>
               </Box>
               
-              <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'text.secondary', fontFamily: 'JetBrains Mono, monospace' }}>ID: {agent.id}</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>{agent.name}</Typography>
+              <Typography sx={{ fontSize: 9, fontWeight: 800, color: 'text.secondary', fontFamily: 'JetBrains Mono, monospace' }}>ID: {agent.id}</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1, fontSize: '1rem' }}>{agent.name}</Typography>
               
               <Chip 
                 label={agent.status} 
                 size="small" 
                 sx={{ 
-                  height: 20, 
-                  fontSize: 10, 
+                  height: 18, 
+                  fontSize: 9, 
                   fontWeight: 900, 
                   bgcolor: agent.status === 'ONLINE' ? alpha('#10b981', 0.1) : alpha('#64748b', 0.1),
                   color: agent.status === 'ONLINE' ? 'primary.main' : 'text.secondary',
@@ -67,8 +67,8 @@ export default function FleetStatusView() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
                 <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.secondary' }}>SYSTEM LOAD</Typography>
-                    <Typography sx={{ fontSize: 10, fontWeight: 800, color: 'primary.main' }}>{agent.load}%</Typography>
+                    <Typography sx={{ fontSize: 9, fontWeight: 700, color: 'text.secondary' }}>SYSTEM LOAD</Typography>
+                    <Typography sx={{ fontSize: 9, fontWeight: 800, color: 'primary.main' }}>{agent.load}%</Typography>
                   </Box>
                   <LinearProgress 
                     variant="determinate" 
@@ -79,12 +79,12 @@ export default function FleetStatusView() {
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                   <Box>
-                    <Typography sx={{ fontSize: 9, fontWeight: 700, color: 'text.secondary' }}>CPU</Typography>
-                    <Typography sx={{ fontSize: 11, fontWeight: 800 }}>{agent.cpu} Core</Typography>
+                    <Typography sx={{ fontSize: 8, fontWeight: 700, color: 'text.secondary' }}>CPU</Typography>
+                    <Typography sx={{ fontSize: 10, fontWeight: 800 }}>{agent.cpu} Core</Typography>
                   </Box>
                   <Box sx={{ textAlign: 'right' }}>
-                    <Typography sx={{ fontSize: 9, fontWeight: 700, color: 'text.secondary' }}>UPTIME</Typography>
-                    <Typography sx={{ fontSize: 11, fontWeight: 800 }}>{agent.uptime}</Typography>
+                    <Typography sx={{ fontSize: 8, fontWeight: 700, color: 'text.secondary' }}>UPTIME</Typography>
+                    <Typography sx={{ fontSize: 10, fontWeight: 800 }}>{agent.uptime}</Typography>
                   </Box>
                 </Box>
               </Box>
@@ -93,16 +93,16 @@ export default function FleetStatusView() {
         ))}
       </Grid>
 
-      <Paper sx={{ p: 4, borderRadius: 4 }}>
+      <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'primary.main', mb: 3 }}>
           <Terminal size={20} />
-          <Typography variant="h6" sx={{ fontWeight: 800 }}>Distributed Node Logs</Typography>
+          <Typography variant="h6" sx={{ fontWeight: 800, fontSize: { xs: '1rem', md: '1.25rem' } }}>Node Logs</Typography>
         </Box>
-        <Box sx={{ bgcolor: '#000', p: 3, borderRadius: 2, fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#94a3b8', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-          <Typography sx={{ color: 'primary.main', mb: 1 }}>[10:52:01] INF :: Intercepter_Alpha :: Successfully routed 402 request to 0x821...F18</Typography>
-          <Typography sx={{ mb: 1 }}>[10:51:44] DBG :: Settler_Beta :: Validating signature for non-custodial wallet auth...</Typography>
-          <Typography sx={{ mb: 1 }}>[10:51:12] INF :: Auditor_Gamma :: Policy check passed for AGENT_8821 (+2.4% headroom)</Typography>
-          <Typography sx={{ color: '#ef4444' }}>[10:50:55] WRN :: Intercepter_Alpha :: Target host latencey exceeds 500ms threshold</Typography>
+        <Box sx={{ bgcolor: '#000', p: 2, borderRadius: 2, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#94a3b8', border: '1px solid rgba(16, 185, 129, 0.1)', overflowX: 'auto' }}>
+          <Typography sx={{ color: 'primary.main', mb: 1, whiteSpace: 'nowrap' }}>[10:52:01] INF :: Intercepter_Alpha :: Routed 402 to 0x821...F18</Typography>
+          <Typography sx={{ mb: 1, whiteSpace: 'nowrap' }}>[10:51:44] DBG :: Settler_Beta :: Validating signature auth...</Typography>
+          <Typography sx={{ mb: 1, whiteSpace: 'nowrap' }}>[10:51:12] INF :: Auditor_Gamma :: Policy passed (+2.4%)</Typography>
+          <Typography sx={{ color: '#ef4444', whiteSpace: 'nowrap' }}>[10:50:55] WRN :: Intercepter_Alpha :: Latency &gt; 500ms</Typography>
         </Box>
       </Paper>
     </Box>

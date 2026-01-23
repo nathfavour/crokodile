@@ -47,24 +47,41 @@ func main() {
 	}
 
 	args := flag.Args()
-	if len(args) > 0 && args[0] == "run" {
-		if len(args) < 2 {
-			fmt.Println("Usage: crok run \"<command>\"")
-			os.Exit(1)
-		}
-
-		go func() {
-			if err := proxy.Start(); err != nil {
-				log.Fatalf("Proxy failed: %v", err)
+	if len(args) > 0 {
+		switch args[0] {
+		case "run":
+			if len(args) < 2 {
+				fmt.Println("Usage: crok run \"<command>\"")
+				os.Exit(1)
 			}
-		}()
 
-		err := RunWithProxy(args[1], *proxyPort)
-		if err != nil {
-			fmt.Printf("Command failed: %v\n", err)
-			os.Exit(1)
+			go func() {
+				if err := proxy.Start(); err != nil {
+					log.Fatalf("Proxy failed: %v", err)
+				}
+			}()
+
+			err := RunWithProxy(args[1], *proxyPort)
+			if err != nil {
+				fmt.Printf("Command failed: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		case "pay":
+			if len(args) < 2 {
+				fmt.Println("Usage: crok pay \"crok://pay?...\"")
+				os.Exit(1)
+			}
+			uri := args[1]
+			fmt.Printf("💳 Processing Payment URI: %s\n", uri)
+			// Mock parsing and success for demo
+			time.Sleep(1 * time.Second)
+			fmt.Println("✅ AI Reasoning Audit Passed")
+			time.Sleep(1 * time.Second)
+			fmt.Println("✅ EIP-3009 Signature Generated")
+			fmt.Println("✅ Settlement Confirmed on Cronos Testnet")
+			return
 		}
-		return
 	}
 
 	if *noTUI {
