@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/table"
@@ -14,21 +13,16 @@ var (
 	accentColor = lipgloss.Color("#10b981")
 	grayColor   = lipgloss.Color("#94a3b8")
 	whiteColor  = lipgloss.Color("#ffffff")
-	errorColor  = lipgloss.Color("#ef4444")
-
-	baseStyle = lipgloss.NewStyle().
-		BorderStyle(lipgloss.RoundedBorder()).
-		BorderForeground(accentColor)
 
 	headerStyle = lipgloss.NewStyle().
-		Foreground(whiteColor).
-		Background(accentColor).
-		Padding(0, 1).
-		Bold(true)
+			Foreground(whiteColor).
+			Background(accentColor).
+			Padding(0, 1).
+			Bold(true)
 
 	statusStyle = lipgloss.NewStyle().
-		Foreground(accentColor).
-		Bold(true)
+			Foreground(accentColor).
+			Bold(true)
 )
 
 type model struct {
@@ -41,7 +35,6 @@ type model struct {
 	width    int
 	height   int
 	lastLog  LogEntry
-	isReg    bool
 }
 
 func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
@@ -62,8 +55,7 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")),
-		BorderBottom(true).
+		BorderForeground(lipgloss.Color("240")).
 		Bold(false)
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")),
@@ -117,12 +109,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.lastLog = LogEntry(msg)
 		
-		rows := []table.Row{}
+		var rows []table.Row
 		for i := len(m.logs) - 1; i >= 0; i-- {
 			l := m.logs[i]
 			paid := "-"
 			if l.Paid {
-				paid = fmt.Sprintf("0.01 USDC")
+				paid = "0.01 USDC"
 			}
 		ows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
@@ -176,12 +168,16 @@ func (m model) View() string {
 		)
 
 	// Main Content
-	logTable := baseStyle.Width(mainWidth).Render(
-		lipgloss.JoinVertical(lipgloss.Left,
-			headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
-			m.table.View(),
-		),
-	)
+	logTable := lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		BorderForeground(accentColor).
+		Width(mainWidth).
+		Render(
+			lipgloss.JoinVertical(lipgloss.Left,
+				headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
+				m.table.View(),
+			),
+		)
 
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
