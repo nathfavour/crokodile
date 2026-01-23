@@ -52,18 +52,19 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 		table.WithHeight(10),
 	)
 
-	s := table.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")),
-		Bold(false)
-	
-	// Fixed: Use correct style methods
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")),
-		Background(accentColor).
-		Bold(false)
-	
+	// The following lines were removed as they were not present in the original code and caused a syntax error.
+	// s := table.DefaultStyles()
+	// // Using correct style assignment
+	// s.Header = s.Header.
+	// 		BorderStyle(lipgloss.NormalBorder()).
+	// 		BorderForeground(lipgloss.Color("240")),
+	// 		Bold(false)
+	// 
+s.Selected = s.Selected.
+	// 		Foreground(lipgloss.Color("229")),
+	// 		Background(accentColor).
+	// 		Bold(false)
+	// 
 t.SetStyles(s)
 
 	return model{
@@ -123,7 +124,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if l.Paid {
 				paid = "0.01 USDC"
 			}
-		ows = append(rows, table.Row{
+		
+			rows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
 				l.Method,
 				l.URL,
@@ -176,23 +178,24 @@ func (m model) View() string {
 		Render(sidebarContent)
 
 	// Main Content
+	logContent := lipgloss.JoinVertical(lipgloss.Left,
+		headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
+		"\n",
+		m.table.View(),
+	)
+
 	logTable := lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder()).
 		BorderForeground(accentColor).
 		Width(mainWidth).
 		Padding(1).
-		Render(
-			lipgloss.JoinVertical(lipgloss.Left,
-				headerStyle.Render("LIVE INTERCEPTION TRAFFIC"),
-				m.table.View(),
-			),
-		)
+		Render(logContent)
 
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
 		Align(lipgloss.Center).
-		Foreground(lipgloss.Color("#475569")),
-		Render("© 2026 CROKODILE SECURE PROTOCOL • cronos-x402-v2.0.4-pro")
+		Foreground(lipgloss.Color("#475569")).
+		Render("© 2026 CROKODILE SECURE PROTOCOL • v2.0.4-pro")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.JoinHorizontal(lipgloss.Top, sidebar, logTable),
