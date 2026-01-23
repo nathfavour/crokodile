@@ -55,10 +55,10 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")),
+		BorderForeground(lipgloss.Color("240")).
 		Bold(false)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
+		Foreground(lipgloss.Color("229")),
 		Background(accentColor).
 		Bold(false)
 	t.SetStyles(s)
@@ -191,7 +191,7 @@ func (m model) View() string {
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
 		Align(lipgloss.Center).
-		Foreground(lipgloss.Color("#475569")).
+		Foreground(lipgloss.Color("#475569")),
 		Render("© 2026 CROKODILE SECURE PROTOCOL • cronos-x402-v2.0.4-pro")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
