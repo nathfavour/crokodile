@@ -16,10 +16,7 @@ import {
   TableRow
 } from '@mui/material';
 import { 
-  LineChart, 
-  Line, 
   XAxis, 
-  YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
@@ -38,7 +35,15 @@ const data = [
   { name: 'Sun', value: 450 },
 ];
 
-const StatCard = ({ title, value, change, icon: Icon, unit }: any) => (
+interface StatCardProps {
+  title: string;
+  value: string;
+  change: string;
+  icon: React.ElementType;
+  unit?: string;
+}
+
+const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => (
   <Paper 
     elevation={0}
     sx={{ 
@@ -190,7 +195,7 @@ export default function DashboardView() {
                 <Typography sx={{ fontSize: 11, color: '#94a3b8', fontFamily: 'JetBrains Mono, monospace' }}><Box component="span" sx={{ color: 'primary.dark', mr: 1 }}>&gt;</Box>EVALUATION: <Box component="span" sx={{ color: 'primary.main' }}>402 Standard Response Required.</Box></Typography>
                 <Typography sx={{ fontSize: 11, color: '#94a3b8', fontFamily: 'JetBrains Mono, monospace', lineHeight: 1.6 }}>
                   <Box component="span" sx={{ color: 'primary.dark', mr: 1 }}>&gt;</Box>LOGIC: 
-                  <Box component="span" sx={{ color: 'primary.light' }}> "Merchant wallet verified. Latency threshold met. 12.50 USDC request within autonomous budget (+2.4% buffer). Reasoning: Essential AWS compute replenishment."</Box>
+                  <Box component="span" sx={{ color: 'primary.light' }}> &quot;Merchant wallet verified. Latency threshold met. 12.50 USDC request within autonomous budget (+2.4% buffer). Reasoning: Essential AWS compute replenishment.&quot;</Box>
                 </Typography>
               </Box>
 

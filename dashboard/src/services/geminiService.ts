@@ -3,7 +3,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
 
-export async function generateForensicTrace(tx: any): Promise<string> {
+interface TransactionData {
+  amount: number;
+  currency: string;
+  agentId: string;
+  merchantDomain: string;
+}
+
+export async function generateForensicTrace(tx: TransactionData): Promise<string> {
   if (!apiKey) {
     return "API_KEY_MISSING: Forensic trace cannot be retrieved from neural engine.";
   }

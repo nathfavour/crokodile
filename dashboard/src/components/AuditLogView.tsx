@@ -16,11 +16,9 @@ import {
   TableRow,
   IconButton,
   CircularProgress,
-  Divider,
-  Tooltip as MuiTooltip
+  Divider
 } from '@mui/material';
 import { 
-  History, 
   Search, 
   ChevronDown, 
   X, 
@@ -255,7 +253,7 @@ export default function AuditLogView() {
                   ) : (
                     <>
                       <Typography sx={{ fontSize: 14, color: 'text.secondary', fontStyle: 'italic', lineHeight: 1.6 }}>
-                        "{trace}"
+                        &quot;{trace}&quot;
                       </Typography>
                       <Divider sx={{ my: 2.5, borderColor: 'rgba(16, 185, 129, 0.1)' }} />
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
