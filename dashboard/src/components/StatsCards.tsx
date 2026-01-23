@@ -45,7 +45,7 @@ export default function StatsCards({ transactions }: StatsCardsProps) {
   return (
     <>
       {stats.map((stat) => (
-        <Grid item xs={12} md={4} key={stat.label}>
+        <Grid size={{ xs: 12, md: 4 }} key={stat.label}>
           <Card 
             variant="outlined" 
             sx={{ 

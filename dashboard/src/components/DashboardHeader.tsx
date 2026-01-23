@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { AppBar, Toolbar, Typography, Box, IconButton, Container, alpha } from '@mui/material';
-import { Refresh as RefreshIcon, Security as SecurityIcon } from '@mui/icons-material';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
 
 interface DashboardHeaderProps {
   error: string | null;

@@ -73,13 +73,13 @@ export default function Dashboard() {
         <Grid container spacing={4}>
           <StatsCards transactions={transactions} />
 
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Box sx={{ height: '600px' }}>
               <ActivityFeed transactions={transactions} loading={loading} />
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ height: '600px' }}>
               <PolicyPanel transactions={transactions} />
             </Box>
