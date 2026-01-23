@@ -32,7 +32,7 @@ A sleek, technical-premium monitoring interface at [crokodile-nathfavour02.verce
 ### Installation
 Install the Crokodile Jaw CLI on your local node with a single command:
 ```bash
-curl -sL https://crokodile-nathfavour02.vercel.app/install.sh | sh
+curl -sL https://crokodile.vercel.app/install.sh | sh
 ```
 
 Alternatively, build from source:
