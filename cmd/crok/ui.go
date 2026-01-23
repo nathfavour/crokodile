@@ -55,10 +55,10 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.Color("240")),
 		Bold(false)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")),
+		Foreground(lipgloss.Color("229")).
 		Background(accentColor).
 		Bold(false)
 	t.SetStyles(s)
@@ -84,7 +84,11 @@ type logMsg LogEntry
 
 func listenForLogs(sub chan LogEntry) tea.Cmd {
 	return func() tea.Msg {
-		return logMsg(<-sub)
+		val, ok := <-sub
+		if !ok {
+			return nil
+		}
+		return logMsg(val)
 	}
 }
 
@@ -116,7 +120,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if l.Paid {
 				paid = "0.01 USDC"
 			}
-		ows = append(rows, table.Row{
+		
+rows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
 				l.Method,
 				l.URL,
@@ -133,6 +138,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.width == 0 || m.height == 0 {
+		return "Initializing UI..."
+	}
+
 	sidebarWidth := 30
 	mainWidth := m.width - sidebarWidth - 6
 
@@ -182,7 +191,7 @@ func (m model) View() string {
 	footer := lipgloss.NewStyle().
 		Width(m.width - 2).
 		Align(lipgloss.Center).
-		Foreground(lipgloss.Color("#475569")),
+		Foreground(lipgloss.Color("#475569")).
 		Render("© 2026 CROKODILE SECURE PROTOCOL • cronos-x402-v2.0.4-pro")
 
 	return lipgloss.JoinVertical(lipgloss.Left,
