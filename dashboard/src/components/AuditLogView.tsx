@@ -36,6 +36,7 @@ export default function AuditLogView() {
   const [traceLoading, setTraceLoading] = useState(false);
   const [trace, setTrace] = useState<string>('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchTransactions = React.useCallback(async () => {
     try {
@@ -137,7 +138,12 @@ export default function AuditLogView() {
           </Grid>
         </Grid>
 
-        <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4 }}>
+        <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, position: 'relative' }}>
+          {loading && transactions.length === 0 && (
+            <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)', zIndex: 1 }}>
+              <CircularProgress size={24} sx={{ color: 'primary.main' }} />
+            </Box>
+          )}
           <Table>
             <TableHead>
               <TableRow>

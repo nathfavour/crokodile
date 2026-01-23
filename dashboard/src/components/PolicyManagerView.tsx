@@ -30,6 +30,7 @@ import { Agent } from '@/app/types';
 
 export default function PolicyManagerView() {
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [newDomain, setNewDomain] = useState('');
   const [saving, setSaving] = useState(false);
@@ -141,6 +142,7 @@ export default function PolicyManagerView() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'primary.main' }}>
             <Settings size={20} />
             <Typography variant="h6" sx={{ fontWeight: 800 }}>Managed Agents</Typography>
+            {loading && <CircularProgress size={16} color="inherit" />}
           </Box>
 
           <Grid container spacing={3}>

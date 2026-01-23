@@ -13,7 +13,8 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  CircularProgress
 } from '@mui/material';
 import { 
   XAxis, 
@@ -88,6 +89,7 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
 
 export default function DashboardView() {
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
   const fetchTransactions = React.useCallback(async () => {
     try {
@@ -254,7 +256,12 @@ export default function DashboardView() {
           </Box>
         </Box>
 
-        <TableContainer>
+        <TableContainer sx={{ position: 'relative', minHeight: 200 }}>
+          {loading && transactions.length === 0 && (
+            <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+              <CircularProgress size={24} sx={{ color: 'primary.main' }} />
+            </Box>
+          )}
           <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>

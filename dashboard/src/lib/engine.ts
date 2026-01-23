@@ -130,7 +130,7 @@ export const processPayment = async (payload: PaymentPayload, config: EngineConf
         );
 
         if (policies.total > 0) {
-          const policy: any = policies.documents[0];
+          const policy = policies.documents[0] as unknown as { maxPerRequest: number; dailyLimit: number };
           
           if (Number(amount) > policy.maxPerRequest) {
             throw new Error(`TRANSACTION_REJECTED: Amount ${amount} exceeds max per-request limit of ${policy.maxPerRequest}`);
@@ -149,14 +149,15 @@ export const processPayment = async (payload: PaymentPayload, config: EngineConf
             ]
           );
 
-          const spentToday = todayTx.documents.reduce((sum, tx: any) => sum + (tx.amount || 0), 0);
+          const spentToday = todayTx.documents.reduce((sum, tx) => sum + ((tx.amount as number) || 0), 0);
           if (spentToday + parseFloat(amount.toString()) > policy.dailyLimit) {
             throw new Error(`BUDGET_EXCEEDED: Daily limit of ${policy.dailyLimit} reached. Total spent: ${spentToday}`);
           }
         }
-      } catch (e: any) {
-        if (e.message.includes('REJECTED') || e.message.includes('EXCEEDED')) throw e;
-        console.warn('Policy check skipped or failed:', e.message);
+      } catch (err) {
+        const error = err as Error;
+        if (error.message.includes('REJECTED') || error.message.includes('EXCEEDED')) throw error;
+        console.warn('Policy check skipped or failed:', error.message);
       }
     }
 
@@ -200,8 +201,9 @@ export const processPayment = async (payload: PaymentPayload, config: EngineConf
             timestamp: Date.now()
           }
         );
-      } catch (e: any) {
-        console.warn('Audit log failed:', e.message);
+      } catch (err) {
+        const error = err as Error;
+        console.warn('Audit log failed:', error.message);
       }
     }
 
