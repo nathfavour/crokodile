@@ -25,7 +25,8 @@ app.post('/pay', async (req, res) => {
     endpoint: process.env.APPWRITE_ENDPOINT,
     projectId: process.env.APPWRITE_PROJECT_ID,
     apiKey: process.env.APPWRITE_API_KEY,
-    databaseId: process.env.APPWRITE_DATABASE_ID
+    databaseId: process.env.APPWRITE_DATABASE_ID,
+    geminiApiKey: process.env.GEMINI_API_KEY
   };
 
   try {

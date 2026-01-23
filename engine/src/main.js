@@ -1,7 +1,99 @@
 const { Client, Databases, ID, Query } = require('node-appwrite');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { ethers } = require('ethers');
+
+const signEIP3009 = async (payload, privateKey) => {
+  // EIP-3009 ReceiveWithAuthorization simulation for Cronos
+  const wallet = new ethers.Wallet(privateKey || ethers.Wallet.createRandom().privateKey);
+  
+  const domain = {
+    name: 'USD Coin',
+    version: '2',
+    chainId: 338, // Cronos Testnet
+    verifyingContract: '0x2f9092f5F41C2084a539b7b163342360c704382c' // Mock USDC on Cronos
+  };
+
+  const types = {
+    ReceiveWithAuthorization: [
+      { name: 'from', type: 'address' },
+      { name: 'to', type: 'address' },
+      { name: 'value', type: 'uint256' },
+      { name: 'validAfter', type: 'uint256' },
+      { name: 'validBefore', type: 'uint256' },
+      { name: 'nonce', type: 'bytes32' }
+    ]
+  };
+
+  const nonce = ethers.hexlify(ethers.randomBytes(32));
+  const validAfter = 0;
+  const validBefore = Math.floor(Date.now() / 1000) + 3600; // 1 hour
+
+  const value = {
+    from: wallet.address,
+    to: '0x000000000000000000000000000000000000dead', // Mock Facilitator/Merchant
+    value: ethers.parseUnits(payload.amount.toString(), 6),
+    validAfter,
+    validBefore,
+    nonce
+  };
+
+  const signature = await wallet.signTypedData(domain, types, value);
+  
+  return {
+    signature,
+    owner: wallet.address,
+    nonce,
+    validAfter,
+    validBefore,
+    txHash: ethers.keccak256(signature)
+  };
+};
+
+const auditReasoning = async (reasoning, amount, merchant, apiKey) => {
+  if (!apiKey) {
+    console.warn('Gemini API key missing, skipping advanced reasoning audit');
+    return { approved: true };
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+  const prompt = `You are the Crokodile AI Reasoning Auditor. Your job is to analyze the reasoning provided by an AI agent for a payment request.
+  
+  Payment Details:
+  - Amount: ${amount}
+  - Merchant: ${merchant}
+  - Reasoning: "${reasoning}"
+  
+  Evaluate if this payment is reasonable, safe, and professional. 
+  Reject payments that:
+  1. Mention illegal activities.
+  2. Seem like a scam or phishing.
+  3. Are for personal/non-business use if the reasoning is "automated service".
+  4. Contain suspicious keywords.
+
+  Respond ONLY with a JSON object:
+  {
+    "approved": boolean,
+    "confidence": number (0-1),
+    "reason": "short explanation"
+  }`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    // Extract JSON in case of markdown formatting
+    const jsonMatch = text.match(/\{.*\}/s);
+    return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+  } catch (e) {
+    console.error('Reasoning audit failed:', e.message);
+    return { approved: true, error: e.message }; // Fail open for now
+  }
+};
 
 const processPayment = async (payload, config) => {
-  const { endpoint, projectId, apiKey, databaseId } = config;
+  const { endpoint, projectId, apiKey, databaseId, geminiApiKey } = config;
 
   const client = new Client()
     .setEndpoint(endpoint || 'https://cloud.appwrite.io/v1')
@@ -56,15 +148,29 @@ const processPayment = async (payload, config) => {
     }
 
     // 2. Reasoning Audit (Advanced)
+    const auditResult = await auditReasoning(reasoning, amount, merchant, geminiApiKey);
+    if (!auditResult.approved) {
+      throw new Error(`REASONING_AUDIT_FAILED: ${auditResult.reason}`);
+    }
+
     const sensitiveKeywords = ['gambling', 'personal', 'private'];
     const lowerReasoning = reasoning.toLowerCase();
     if (sensitiveKeywords.some(word => lowerReasoning.includes(word))) {
       throw new Error('POLICY_VIOLATION: Reasoning contains restricted categories.');
     }
 
-    // 3. Transaction Signing (Simulation)
-    const txHash = "0x" + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2);
-    const paymentProof = Buffer.from(JSON.stringify({ txHash, agentId, merchant, amount })).toString('base64');
+    // 3. Transaction Signing (EIP-3009)
+    const eip3009Result = await signEIP3009({ amount, merchant }, process.env.AGENT_PRIVATE_KEY);
+    const txHash = eip3009Result.txHash;
+    const paymentProof = Buffer.from(JSON.stringify({ 
+      txHash, 
+      agentId, 
+      merchant, 
+      amount,
+      signature: eip3009Result.signature,
+      owner: eip3009Result.owner,
+      nonce: eip3009Result.nonce
+    })).toString('base64');
 
     // 4. Audit Log
     if (databaseId) {
@@ -106,7 +212,8 @@ const main = async ({ req, res, log, error }) => {
     endpoint: process.env.APPWRITE_FUNCTION_ENDPOINT,
     projectId: process.env.APPWRITE_FUNCTION_PROJECT_ID,
     apiKey: process.env.APPWRITE_FUNCTION_API_KEY,
-    databaseId: 'crokodile_db'
+    databaseId: 'crokodile_db',
+    geminiApiKey: process.env.GEMINI_API_KEY
   };
 
   if (req.method === 'POST') {
