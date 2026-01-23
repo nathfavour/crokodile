@@ -14,7 +14,6 @@ import {
   AppBar, 
   Toolbar, 
   Avatar, 
-  InputBase, 
   alpha,
   Button,
   Container,
@@ -30,7 +29,8 @@ import {
   Tooltip,
   TextField,
   InputAdornment,
-  CircularProgress
+  CircularProgress,
+  Chip
 } from '@mui/material';
 import { 
   LayoutDashboard, 
@@ -41,13 +41,8 @@ import {
   Terminal,
   Copy,
   Check,
-  Cpu,
-  Wifi,
-  Zap,
-  Search,
   Wand2,
   Share2,
-  X,
   Sparkles,
   Link as LinkIcon
 } from 'lucide-react';
