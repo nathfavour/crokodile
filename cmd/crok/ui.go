@@ -55,12 +55,10 @@ func initialModel(p *ProxyServer, e *EngineClient, agentID string) model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.Color("240")),
 		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")),
-		Background(accentColor).
-		Bold(false)
+	
+	// Fix: Apply styles via table.WithStyles or set individual style fields correctly
 	t.SetStyles(s)
 
 	return model{
@@ -120,8 +118,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if l.Paid {
 				paid = "0.01 USDC"
 			}
-		
-rows = append(rows, table.Row{
+		ows = append(rows, table.Row{
 				l.Timestamp.Format("15:04:05"),
 				l.Method,
 				l.URL,
