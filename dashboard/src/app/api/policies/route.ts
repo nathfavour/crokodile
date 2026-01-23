@@ -28,19 +28,20 @@ export async function GET() {
     const response = await databases.listDocuments(databaseId, 'policies');
     
     // Map Appwrite docs to our Agent type
-    const agents = response.documents.map((doc: any) => ({
-      id: doc.agentId,
-      name: doc.name || `Agent_${doc.agentId}`,
-      status: doc.status || 'ACTIVE',
-      dailyBudget: doc.dailyLimit,
+    const agents = response.documents.map((doc) => ({
+      id: doc.agentId as string,
+      name: (doc.name as string) || `Agent_${doc.agentId}`,
+      status: (doc.status as string) || 'ACTIVE',
+      dailyBudget: doc.dailyLimit as number,
       currentSpend: 0, // In a real app, we'd calculate this from transactions
-      allowedDomains: doc.allowedDomains || []
+      allowedDomains: (doc.allowedDomains as string[]) || []
     }));
 
     return NextResponse.json(agents);
-  } catch (err: any) {
-    console.error('Policies GET Error:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    console.error('Policies GET Error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
@@ -89,8 +90,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    console.error('Policies POST Error:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    console.error('Policies POST Error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

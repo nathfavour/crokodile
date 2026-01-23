@@ -36,7 +36,6 @@ export default function AuditLogView() {
   const [traceLoading, setTraceLoading] = useState(false);
   const [trace, setTrace] = useState<string>('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const fetchTransactions = React.useCallback(async () => {
     try {

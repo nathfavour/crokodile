@@ -30,7 +30,6 @@ import { Agent } from '@/app/types';
 
 export default function PolicyManagerView() {
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [newDomain, setNewDomain] = useState('');
   const [saving, setSaving] = useState(false);

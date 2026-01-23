@@ -101,9 +101,10 @@ const auditReasoning = async (reasoning: string, amount: string | number, mercha
     const text = response.text();
     const jsonMatch = text.match(/\{.*\}/s);
     return JSON.parse(jsonMatch ? jsonMatch[0] : text);
-  } catch (e: any) {
-    console.error('Reasoning audit failed:', e.message);
-    return { approved: true, error: e.message };
+  } catch (err) {
+    const error = err as Error;
+    console.error('Reasoning audit failed:', error.message);
+    return { approved: true, error: error.message };
   }
 };
 

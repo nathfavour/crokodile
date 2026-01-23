@@ -13,10 +13,7 @@ import {
   IconButton
 } from '@mui/material';
 import { 
-  Activity, 
-  Zap, 
   Cpu, 
-  Shield, 
   Terminal,
   MoreVertical
 } from 'lucide-react';

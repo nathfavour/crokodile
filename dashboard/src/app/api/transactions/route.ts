@@ -26,23 +26,24 @@ export async function GET() {
       [Query.orderDesc('timestamp'), Query.limit(50)]
     );
 
-    const transactions = response.documents.map((doc: any) => ({
-      id: doc.txHash || doc.$id,
-      merchant: doc.merchant,
-      merchantDomain: doc.merchant,
-      agentId: doc.agentId,
-      amount: doc.amount,
-      currency: doc.currency,
+    const transactions = response.documents.map((doc) => ({
+      id: (doc.txHash as string) || doc.$id,
+      merchant: doc.merchant as string,
+      merchantDomain: doc.merchant as string,
+      agentId: doc.agentId as string,
+      amount: doc.amount as number,
+      currency: doc.currency as string,
       status: doc.status === 'settled' ? 'SETTLED' : 'FAILED',
-      timestamp: new Date(doc.timestamp).toLocaleString(),
+      timestamp: new Date(doc.timestamp as number).toLocaleString(),
       time: 'Just now', // Simplified for now
-      hash: doc.txHash,
-      reasoning: doc.reasoningTrace
+      hash: doc.txHash as string,
+      reasoning: doc.reasoningTrace as string
     }));
 
     return NextResponse.json(transactions);
-  } catch (err: any) {
-    console.error('Transactions API Error:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err) {
+    const error = err as Error;
+    console.error('Transactions API Error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

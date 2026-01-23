@@ -88,7 +88,6 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
 
 export default function DashboardView() {
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
-  const [loading, setLoading] = React.useState(true);
 
   const fetchTransactions = React.useCallback(async () => {
     try {
@@ -268,7 +267,7 @@ export default function DashboardView() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {displayTransactions.map((tx: any, i) => (
+              {displayTransactions.map((tx, i) => (
                 <TableRow 
                   key={tx.id || i} 
                   sx={{ 
