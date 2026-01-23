@@ -137,12 +137,12 @@ export default function DashboardView() {
         </Grid>
       </Grid>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, md: 4 }}>
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Paper elevation={0} sx={{ p: 4, borderRadius: 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800 }}>Spending Insights</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 800, fontSize: { xs: '1rem', md: '1.25rem' } }}>Spending Insights</Typography>
                 <Typography sx={{ fontSize: 12, color: 'text.secondary', fontWeight: 600 }}>Volume projection across the X402 economy</Typography>
               </Box>
               <Box sx={{ display: 'flex', bgcolor: alpha('#10b981', 0.05), border: '1px solid rgba(16, 185, 129, 0.1)', borderRadius: 2, p: 0.5 }}>
@@ -151,7 +151,7 @@ export default function DashboardView() {
                     key={t} 
                     size="small"
                     sx={{ 
-                      minWidth: 44, 
+                      minWidth: { xs: 36, md: 44 }, 
                       fontSize: 10, 
                       fontWeight: 800,
                       borderRadius: 1.5,
@@ -168,7 +168,7 @@ export default function DashboardView() {
               </Box>
             </Box>
             
-            <Box sx={{ height: 300, width: '100%' }}>
+            <Box sx={{ height: { xs: 200, md: 300 }, width: '100%' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data}>
                   <defs>
