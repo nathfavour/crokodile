@@ -11,7 +11,7 @@ interface PolicyPanelProps {
 
 export default function PolicyPanel({ transactions }: PolicyPanelProps) {
   const settledAmount = transactions
-    .filter(t => t.status === 'success')
+    .filter(t => t.status === 'SETTLED' || t.status === 'success')
     .length * 0.01;
   
   const budgetLimit = 100.00;

@@ -35,6 +35,7 @@ import {
 import DashboardView from '@/components/DashboardView';
 import AuditLogView from '@/components/AuditLogView';
 import PolicyManagerView from '@/components/PolicyManagerView';
+import FleetStatusView from '@/components/FleetStatusView';
 import { ViewType } from './types';
 
 const drawerWidth = 260;
@@ -244,11 +245,7 @@ export default function AppLayout() {
             {currentView === 'DASHBOARD' && <DashboardView />}
             {currentView === 'AUDIT' && <AuditLogView />}
             {currentView === 'POLICY' && <PolicyManagerView />}
-            {currentView === 'LEDGER' && (
-              <Box sx={{ py: 10, textAlign: 'center', color: 'text.secondary' }}>
-                <Typography variant="h6">Fleet Management coming soon...</Typography>
-              </Box>
-            )}
+            {currentView === 'LEDGER' && <FleetStatusView />}
             {currentView === 'SYSTEM' && (
               <Box sx={{ py: 10, textAlign: 'center', color: 'text.secondary' }}>
                 <Typography variant="h6">System Diagnostics coming soon...</Typography>

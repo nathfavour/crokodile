@@ -15,7 +15,7 @@ interface StatsCardsProps {
 
 export default function StatsCards({ transactions }: StatsCardsProps) {
   const totalSettled = transactions
-    .filter(t => t.status === 'success')
+    .filter(t => t.status === 'SETTLED' || t.status === 'success')
     .length * 0.01;
 
   const stats = [

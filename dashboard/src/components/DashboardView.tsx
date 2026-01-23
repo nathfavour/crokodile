@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { 
-  Grid2 as Grid, 
+  Grid, 
   Paper, 
   Box, 
   Typography, 
@@ -24,6 +24,7 @@ import {
   Area
 } from 'recharts';
 import { CreditCard, Bot, Zap, ShieldCheck } from 'lucide-react';
+import { Transaction } from '@/app/types';
 
 const data = [
   { name: 'Mon', value: 400 },
@@ -86,6 +87,35 @@ const StatCard = ({ title, value, change, icon: Icon, unit }: StatCardProps) => 
 );
 
 export default function DashboardView() {
+  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const fetchTransactions = React.useCallback(async () => {
+    try {
+      const response = await fetch('/api/transactions');
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchTransactions();
+    const interval = setInterval(fetchTransactions, 5000);
+    return () => clearInterval(interval);
+  }, [fetchTransactions]);
+
+  const displayTransactions = transactions.length > 0 ? transactions.slice(0, 5) : [
+    { id: 'mock-1', merchant: 'CloudCompute-ZK', hash: '0x821...F18', amount: '42.50', agentId: 'Agent_018', time: '12:44:02.12', status: 'SETTLED' },
+    { id: 'mock-2', merchant: 'Node-Charging-88', hash: '0x321...E29', amount: '112.00', agentId: 'Agent_012', time: '12:42:10.05', status: 'SETTLED' },
+    { id: 'mock-3', merchant: 'DataLake-S3', hash: '0x992...B04', amount: '8.12', agentId: 'Agent_099', time: '12:41:55.30', status: 'SETTLED' },
+  ];
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <Grid container spacing={3}>
@@ -238,13 +268,9 @@ export default function DashboardView() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {[
-                { name: 'CloudCompute-ZK', wallet: '0x821...F18', amount: '42.50', agent: 'Agent_018', time: '12:44:02.12', status: 'SETTLED' },
-                { name: 'Node-Charging-88', wallet: '0x321...E29', amount: '112.00', agent: 'Agent_012', time: '12:42:10.05', status: 'SETTLED' },
-                { name: 'DataLake-S3', wallet: '0x992...B04', amount: '8.12', agent: 'Agent_099', time: '12:41:55.30', status: 'SETTLED' },
-              ].map((tx, i) => (
+              {displayTransactions.map((tx: any, i) => (
                 <TableRow 
-                  key={i} 
+                  key={tx.id || i} 
                   sx={{ 
                     '&:hover': { bgcolor: alpha('#10b981', 0.02) },
                     '& td': { borderBottom: '1px solid rgba(16, 185, 129, 0.05)' }
@@ -252,18 +278,18 @@ export default function DashboardView() {
                 >
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box sx={{ width: 32, height: 32, bgcolor: alpha('#10b981', 0.1), borderRadius: 2, display: 'flex', alignItems: 'center', justifyCenter: 'center', color: 'primary.main' }}>
+                      <Box sx={{ width: 32, height: 32, bgcolor: alpha('#10b981', 0.1), borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'primary.main' }}>
                         <Zap size={14} />
                       </Box>
                       <Box>
-                        <Typography sx={{ fontSize: 14, fontWeight: 800 }}>{tx.name}</Typography>
-                        <Typography sx={{ fontSize: 10, color: 'text.secondary', fontFamily: 'JetBrains Mono, monospace' }}>{tx.wallet}</Typography>
+                        <Typography sx={{ fontSize: 14, fontWeight: 800 }}>{tx.merchant}</Typography>
+                        <Typography sx={{ fontSize: 10, color: 'text.secondary', fontFamily: 'JetBrains Mono, monospace' }}>{tx.hash ? (tx.hash.substring(0, 10) + '...') : ''}</Typography>
                       </Box>
                     </Box>
                   </TableCell>
                   <TableCell sx={{ fontWeight: 800 }}>{tx.amount}</TableCell>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>{tx.agent}</TableCell>
-                  <TableCell sx={{ color: 'text.secondary', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>{tx.time}</TableCell>
+                  <TableCell sx={{ color: 'text.secondary', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>{tx.agentId}</TableCell>
+                  <TableCell sx={{ color: 'text.secondary', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>{tx.time || tx.timestamp}</TableCell>
                   <TableCell>
                     <Box component="span" sx={{ 
                       fontSize: 10, 

@@ -63,7 +63,7 @@ export default function ActivityFeed({ transactions, loading }: ActivityFeedProp
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: 44 }}>
-                    {tx.status === 'success' ? (
+                    {tx.status === 'SETTLED' || tx.status === 'success' ? (
                       <Box sx={{ color: 'primary.main', display: 'flex' }}><SuccessIcon sx={{ fontSize: '1.2rem' }} /></Box>
                     ) : (
                       <Box sx={{ color: 'error.main', display: 'flex' }}><ErrorIcon sx={{ fontSize: '1.2rem' }} /></Box>
@@ -75,7 +75,7 @@ export default function ActivityFeed({ transactions, loading }: ActivityFeedProp
                         <Typography sx={{ fontWeight: 700, fontSize: '0.85rem', color: '#fff' }}>
                           {tx.merchant}
                         </Typography>
-                        <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: tx.status === 'error' ? 'error.main' : 'primary.main', fontFamily: 'var(--font-geist-mono)' }}>
+                        <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: tx.status === 'FAILED' || tx.status === 'error' ? 'error.main' : 'primary.main', fontFamily: 'var(--font-geist-mono)' }}>
                           {tx.amount} <Typography component="span" variant="caption" sx={{ opacity: 0.5 }}>USDC</Typography>
                         </Typography>
                       </Box>

@@ -1,15 +1,28 @@
 #!/bin/bash
 
-# Simple script to test the full flow
-# Requires dev-brain and dev-merchant to be running
+# Crokodile End-to-End Test Flow
+# 🐊 This script demonstrates the 402 interception and negotiation flow.
 
-echo "🚀 Testing CROKODILE Snap Protocol..."
-echo "-----------------------------------"
+echo "🚀 Starting Crokodile Test Flow..."
 
-# Step 1: Normal request through proxy to mock merchant
-# The proxy will detect 402, call the engine, get proof, and retry.
-# We use -x to specify the proxy.
-curl -s -x http://localhost:8080 http://localhost:4000/data | json_pp
+# 1. Build the CLI
+echo "🛠️  Building Crokodile CLI..."
+make build
 
-echo "-----------------------------------"
-echo "✅ Check the Dashboard and CLI logs for activity."
+# 2. Check if Next.js is running
+echo "🔍 Checking for Crokodile Engine (Next.js)..."
+if ! curl -s http://localhost:3000 > /dev/null; then
+  echo "❌ Error: Next.js app is not running on http://localhost:3000"
+  echo "   Please run 'make dev-dashboard' in another terminal first."
+  exit 1
+fi
+
+# 3. Run a request through the proxy
+echo "📡 Sending request to Mock Merchant via Crokodile Proxy..."
+echo "--------------------------------------------------------"
+
+./bin/crok run "curl -v http://localhost:3000/api/mock-merchant"
+
+echo "--------------------------------------------------------"
+echo "✅ Test Flow Complete."
+echo "Check the Dashboard at http://localhost:3000 to see the settlement log."

@@ -13,21 +13,6 @@ type EngineClient struct {
 	Client   *http.Client
 }
 
-type PaymentPayload struct {
-	AgentID   string  `json:"agentId"`
-	Amount    float64 `json:"amount"`
-	Merchant  string  `json:"merchant"`
-	Currency  string  `json:"currency"`
-	Reasoning string  `json:"reasoning"`
-}
-
-type PaymentResponse struct {
-	Success      bool   `json:"success"`
-	TxHash       string `json:"txHash"`
-	PaymentProof string `json:"paymentProof"`
-	Message      string `json:"message"`
-}
-
 func NewEngineClient(endpoint string) *EngineClient {
 	return &EngineClient{
 		Endpoint: endpoint,
@@ -41,7 +26,7 @@ func (c *EngineClient) RequestPayment(payload PaymentPayload) (*PaymentResponse,
 		return nil, err
 	}
 
-	resp, err := c.Client.Post(c.Endpoint+"/pay", "application/json", bytes.NewBuffer(data))
+	resp, err := c.Client.Post(c.Endpoint+"/api/pay", "application/json", bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}

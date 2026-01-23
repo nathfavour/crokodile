@@ -3,10 +3,13 @@ export interface Transaction {
   timestamp: string;
   agentId: string;
   merchantDomain: string;
-  amount: number;
+  merchant?: string; // Optional to handle different data sources
+  amount: number | string;
   currency: string;
-  status: 'SETTLED' | 'PENDING' | 'FAILED';
+  status: 'SETTLED' | 'PENDING' | 'FAILED' | 'success' | 'error';
   hash: string;
+  time?: string;
+  error?: string;
   reasoning?: string;
 }
 

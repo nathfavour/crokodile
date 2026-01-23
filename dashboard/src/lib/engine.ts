@@ -1,16 +1,32 @@
-const { Client, Databases, ID, Query } = require('node-appwrite');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { ethers } = require('ethers');
+import { Client, Databases, ID, Query } from 'node-appwrite';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { ethers } from 'ethers';
 
-const signEIP3009 = async (payload, privateKey) => {
-  // EIP-3009 ReceiveWithAuthorization simulation for Cronos
+export interface PaymentPayload {
+  agentId: string;
+  amount: number | string;
+  merchant: string;
+  currency?: string;
+  reasoning: string;
+}
+
+export interface EngineConfig {
+  endpoint: string;
+  projectId: string;
+  apiKey: string;
+  databaseId: string;
+  geminiApiKey: string;
+  agentPrivateKey?: string;
+}
+
+const signEIP3009 = async (payload: { amount: string | number; merchant: string }, privateKey?: string) => {
   const wallet = new ethers.Wallet(privateKey || ethers.Wallet.createRandom().privateKey);
   
   const domain = {
     name: 'USD Coin',
     version: '2',
     chainId: 338, // Cronos Testnet
-    verifyingContract: '0x2f9092f5F41C2084a539b7b163342360c704382c' // Mock USDC on Cronos
+    verifyingContract: '0x2f9092f5F41C2084a539b7b163342360c704382c'
   };
 
   const types = {
@@ -26,11 +42,11 @@ const signEIP3009 = async (payload, privateKey) => {
 
   const nonce = ethers.hexlify(ethers.randomBytes(32));
   const validAfter = 0;
-  const validBefore = Math.floor(Date.now() / 1000) + 3600; // 1 hour
+  const validBefore = Math.floor(Date.now() / 1000) + 3600;
 
   const value = {
     from: wallet.address,
-    to: '0x000000000000000000000000000000000000dead', // Mock Facilitator/Merchant
+    to: '0x000000000000000000000000000000000000dead',
     value: ethers.parseUnits(payload.amount.toString(), 6),
     validAfter,
     validBefore,
@@ -49,7 +65,7 @@ const signEIP3009 = async (payload, privateKey) => {
   };
 };
 
-const auditReasoning = async (reasoning, amount, merchant, apiKey) => {
+const auditReasoning = async (reasoning: string, amount: string | number, merchant: string, apiKey: string) => {
   if (!apiKey) {
     console.warn('Gemini API key missing, skipping advanced reasoning audit');
     return { approved: true };
@@ -83,17 +99,16 @@ const auditReasoning = async (reasoning, amount, merchant, apiKey) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    // Extract JSON in case of markdown formatting
     const jsonMatch = text.match(/\{.*\}/s);
     return JSON.parse(jsonMatch ? jsonMatch[0] : text);
-  } catch (e) {
+  } catch (e: any) {
     console.error('Reasoning audit failed:', e.message);
-    return { approved: true, error: e.message }; // Fail open for now
+    return { approved: true, error: e.message };
   }
 };
 
-const processPayment = async (payload, config) => {
-  const { endpoint, projectId, apiKey, databaseId, geminiApiKey } = config;
+export const processPayment = async (payload: PaymentPayload, config: EngineConfig) => {
+  const { endpoint, projectId, apiKey, databaseId, geminiApiKey, agentPrivateKey } = config;
 
   const client = new Client()
     .setEndpoint(endpoint || 'https://cloud.appwrite.io/v1')
@@ -105,7 +120,6 @@ const processPayment = async (payload, config) => {
   try {
     const { agentId, amount, merchant, currency, reasoning } = payload;
 
-    // 1. Policy Enforcement
     if (databaseId) {
       try {
         const policies = await databases.listDocuments(
@@ -115,14 +129,12 @@ const processPayment = async (payload, config) => {
         );
 
         if (policies.total > 0) {
-          const policy = policies.documents[0];
+          const policy: any = policies.documents[0];
           
-          // Max Per Request Check
-          if (amount > policy.maxPerRequest) {
+          if (Number(amount) > policy.maxPerRequest) {
             throw new Error(`TRANSACTION_REJECTED: Amount ${amount} exceeds max per-request limit of ${policy.maxPerRequest}`);
           }
 
-          // Daily Budget Check
           const now = new Date();
           const startOfDay = new Date(now.setHours(0,0,0,0)).getTime();
           
@@ -136,18 +148,17 @@ const processPayment = async (payload, config) => {
             ]
           );
 
-          const spentToday = todayTx.documents.reduce((sum, tx) => sum + (tx.amount || 0), 0);
-          if (spentToday + parseFloat(amount) > policy.dailyLimit) {
+          const spentToday = todayTx.documents.reduce((sum, tx: any) => sum + (tx.amount || 0), 0);
+          if (spentToday + parseFloat(amount.toString()) > policy.dailyLimit) {
             throw new Error(`BUDGET_EXCEEDED: Daily limit of ${policy.dailyLimit} reached. Total spent: ${spentToday}`);
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         if (e.message.includes('REJECTED') || e.message.includes('EXCEEDED')) throw e;
         console.warn('Policy check skipped or failed:', e.message);
       }
     }
 
-    // 2. Reasoning Audit (Advanced)
     const auditResult = await auditReasoning(reasoning, amount, merchant, geminiApiKey);
     if (!auditResult.approved) {
       throw new Error(`REASONING_AUDIT_FAILED: ${auditResult.reason}`);
@@ -159,8 +170,7 @@ const processPayment = async (payload, config) => {
       throw new Error('POLICY_VIOLATION: Reasoning contains restricted categories.');
     }
 
-    // 3. Transaction Signing (EIP-3009)
-    const eip3009Result = await signEIP3009({ amount, merchant }, process.env.AGENT_PRIVATE_KEY);
+    const eip3009Result = await signEIP3009({ amount, merchant }, agentPrivateKey);
     const txHash = eip3009Result.txHash;
     const paymentProof = Buffer.from(JSON.stringify({ 
       txHash, 
@@ -172,7 +182,6 @@ const processPayment = async (payload, config) => {
       nonce: eip3009Result.nonce
     })).toString('base64');
 
-    // 4. Audit Log
     if (databaseId) {
       try {
         await databases.createDocument(
@@ -181,7 +190,7 @@ const processPayment = async (payload, config) => {
           ID.unique(),
           {
             merchant,
-            amount: parseFloat(amount),
+            amount: parseFloat(amount.toString()),
             currency: currency || 'USDC',
             txHash,
             status: 'settled',
@@ -190,7 +199,7 @@ const processPayment = async (payload, config) => {
             timestamp: Date.now()
           }
         );
-      } catch (e) {
+      } catch (e: any) {
         console.warn('Audit log failed:', e.message);
       }
     }
@@ -206,28 +215,3 @@ const processPayment = async (payload, config) => {
     throw err;
   }
 };
-
-const main = async ({ req, res, log, error }) => {
-  const config = {
-    endpoint: process.env.APPWRITE_FUNCTION_ENDPOINT,
-    projectId: process.env.APPWRITE_FUNCTION_PROJECT_ID,
-    apiKey: process.env.APPWRITE_FUNCTION_API_KEY,
-    databaseId: 'crokodile_db',
-    geminiApiKey: process.env.GEMINI_API_KEY
-  };
-
-  if (req.method === 'POST') {
-    try {
-      const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      const result = await processPayment(payload, config);
-      return res.json(result);
-    } catch (err) {
-      return res.json({ success: false, message: err.message }, 400);
-    }
-  }
-
-  return res.send('🐊 Crokodile Engine is online.');
-};
-
-module.exports = main;
-module.exports.processPayment = processPayment;

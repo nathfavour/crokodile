@@ -4,14 +4,15 @@ import React, { useState } from 'react';
 import { 
   Box, 
   Typography, 
-  Grid2 as Grid, 
+  Grid, 
   Paper, 
   Button, 
   alpha, 
   LinearProgress,
   Chip,
   TextField,
-  InputAdornment
+  InputAdornment,
+  CircularProgress
 } from '@mui/material';
 import { 
   Bot, 
@@ -28,14 +29,51 @@ import {
 import { Agent } from '@/app/types';
 
 export default function PolicyManagerView() {
-  const [agents] = useState<Agent[]>([
-    { id: '8829-X', name: 'Agent_04_Payment', status: 'ACTIVE', dailyBudget: 50.00, currentSpend: 12.50, allowedDomains: ['api.cronos.org', 'nexus-bridge.io'] },
-    { id: '1102-Y', name: 'Agent_09_Nexus', status: 'EDITING', dailyBudget: 150.00, currentSpend: 120.00, allowedDomains: ['api.cronos.org', 'nexus-bridge.io'] },
-    { id: '4492-Z', name: 'Agent_12_Relay', status: 'PAUSED', dailyBudget: 75.00, currentSpend: 0.00, allowedDomains: ['relay.mainnet.net'] },
-  ]);
-
-  const [editingAgent, setEditingAgent] = useState<Agent | null>(agents[1]);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
   const [newDomain, setNewDomain] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const fetchPolicies = React.useCallback(async () => {
+    try {
+      const response = await fetch('/api/policies');
+      if (response.ok) {
+        const data = await response.json();
+        setAgents(data);
+        if (data.length > 0 && !editingAgent) {
+          setEditingAgent(data[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch policies:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [editingAgent]);
+
+  React.useEffect(() => {
+    fetchPolicies();
+  }, [fetchPolicies]);
+
+  const handleSave = async () => {
+    if (!editingAgent) return;
+    setSaving(true);
+    try {
+      const response = await fetch('/api/policies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingAgent),
+      });
+      if (response.ok) {
+        await fetchPolicies();
+      }
+    } catch (err) {
+      console.error('Failed to save policy:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleAddDomain = () => {
     if (!newDomain || !editingAgent) return;
@@ -302,10 +340,12 @@ export default function PolicyManagerView() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
                 <Button 
                   variant="contained" 
-                  startIcon={<Save size={18} />}
+                  onClick={handleSave}
+                  disabled={saving}
+                  startIcon={saving ? <CircularProgress size={18} color="inherit" /> : <Save size={18} />}
                   sx={{ py: 2, borderRadius: 3, fontWeight: 800, boxShadow: '0 8px 16px rgba(16, 185, 129, 0.1)' }}
                 >
-                  Save Changes
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </Button>
                 <Button 
                   variant="outlined" 
